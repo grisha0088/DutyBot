@@ -1,0 +1,12 @@
+c:\users\g.dementiev\documents\visual studio 2012\Projects\DutyReminder\DutyReminder\bin\Debug\DutyReminder.exe.config
+c:\users\g.dementiev\documents\visual studio 2012\Projects\DutyReminder\DutyReminder\obj\Debug\DutyReminder.csprojResolveAssemblyReference.cache
+c:\users\g.dementiev\documents\visual studio 2012\Projects\DutyReminder\DutyReminder\bin\Debug\DutyReminder.exe
+c:\users\g.dementiev\documents\visual studio 2012\Projects\DutyReminder\DutyReminder\bin\Debug\DutyReminder.pdb
+c:\users\g.dementiev\documents\visual studio 2012\Projects\DutyReminder\DutyReminder\obj\Debug\DutyReminder.exe
+c:\users\g.dementiev\documents\visual studio 2012\Projects\DutyReminder\DutyReminder\obj\Debug\DutyReminder.pdb
+D:\Projects\DutyReminder_test\DutyReminder\bin\Debug\DutyReminder.exe.config
+D:\Projects\DutyReminder_test\DutyReminder\obj\Debug\DutyReminder.exe
+D:\Projects\DutyReminder_test\DutyReminder\obj\Debug\DutyReminder.pdb
+D:\Projects\DutyReminder_test\DutyReminder\bin\Debug\DutyReminder.exe
+D:\Projects\DutyReminder_test\DutyReminder\bin\Debug\DutyReminder.pdb
+D:\Projects\DutyReminder_test\DutyReminder\obj\Debug\DutyReminder.csprojResolveAssemblyReference.cache
