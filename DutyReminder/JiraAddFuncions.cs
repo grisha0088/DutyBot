@@ -57,7 +57,7 @@ namespace DutyBot
             {
                 Logger.LogException("error", message.chat.id, "AssingTicket", ex.GetType() + ": " + ex.Message, issue.Key.Value);
                 DBReader.updateuserstate(message.chat.id, 3);
-                Bot.SendMessage(message.chat.id, "Что-то пошло не так//", "{\"keyboard\": [[\"Проверь тикеты\"], [\"Кто сейчас дежурит?\"], [\"Помоги с дежурством\"], [\"Пока ничего\"]],\"resize_keyboard\":true,\"one_time_keyboard\":true}");
+                Bot.SendMessage(message.chat.id, "Что-то пошло не так777", "{\"keyboard\": [[\"Проверь тикеты\"], [\"Кто сейчас дежурит?\"], [\"Помоги с дежурством\"], [\"Пока ничего\"]],\"resize_keyboard\":true,\"one_time_keyboard\":true}");
 
             }
         }
