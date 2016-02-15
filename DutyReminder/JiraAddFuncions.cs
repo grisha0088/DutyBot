@@ -55,7 +55,7 @@ namespace DutyBot
             }
             catch (Exception ex)
             {
-                Logger.LogException("error", message.chat.id, "AssingTicket", ex.Message);
+                Logger.LogException("error", message.chat.id, "AssingTicket", ex.GetType() + ": " + ex.Message, issue.Key.Value);
                 DBReader.updateuserstate(message.chat.id, 3);
                 Bot.SendMessage(message.chat.id, "Что-то пошло не так.", "{\"keyboard\": [[\"Проверь тикеты\"], [\"Кто сейчас дежурит?\"], [\"Помоги с дежурством\"], [\"Пока ничего\"]],\"resize_keyboard\":true,\"one_time_keyboard\":true}");
 
@@ -98,9 +98,10 @@ namespace DutyBot
             }
             catch (Exception ex)
             {
-                Logger.LogException("error", message.chat.id, "AssingTicket6", ex.Message);
+                Logger.LogException("error", message.chat.id, "AssingTicket6", ex.GetType() + ": " + ex.Message, issue.Key.Value);
                 DBReader.updateticket(message.chat.id, " ");
-                Bot.SendMessage(message.chat.id, "Что-то пошло не так. Останавливаю мониторинг.", "{\"keyboard\": [[\"Проверь тикеты\"], [\"Кто сейчас дежурит?\"], [\"Помоги с дежурством\"], [\"Пока ничего\"]],\"resize_keyboard\":true,\"one_time_keyboard\":true}");
+                DBReader.updateuserstate(message.chat.id, 5);
+                Bot.SendMessage(message.chat.id, "Что-то пошло не так. Возможно, тикет был изменён кем-то еще. Продолжаю мониторинг.");
 
             }
         }
@@ -137,7 +138,7 @@ namespace DutyBot
             }
             catch (Exception ex)
             {
-                Logger.LogException("error", message.chat.id, "ResolveTicket", ex.Message);
+                Logger.LogException("error", message.chat.id, "ResolveTicket", ex.GetType() + ": " + ex.Message, issue.Key.Value);
                 DBReader.updateuserstate(message.chat.id, 3);
                 Bot.SendMessage(message.chat.id, "Что-то пошло не так.", "{\"keyboard\": [[\"Проверь тикеты\"], [\"Кто сейчас дежурит?\"], [\"Помоги с дежурством\"], [\"Пока ничего\"]],\"resize_keyboard\":true,\"one_time_keyboard\":true}");
 
@@ -178,9 +179,10 @@ namespace DutyBot
             }
             catch (Exception ex)
             {
-                Logger.LogException("error", message.chat.id, "ResolveTicket6", ex.Message);
-                DBReader.updateuserstate(message.chat.id, 3);
-                Bot.SendMessage(message.chat.id, "Что-то пошло не так.", "{\"keyboard\": [[\"Проверь тикеты\"], [\"Кто сейчас дежурит?\"], [\"Помоги с дежурством\"], [\"Пока ничего\"]],\"resize_keyboard\":true,\"one_time_keyboard\":true}");
+                Logger.LogException("error", message.chat.id, "ResolveTicket6", ex.GetType() + ": " + ex.Message, issue.Key.Value);
+                DBReader.updateticket(message.chat.id, " ");
+                DBReader.updateuserstate(message.chat.id, 5);
+                Bot.SendMessage(message.chat.id, "Что-то пошло не так. Возможно, тикет был изменён кем-то еще. Продолжаю мониторинг.");
 
             }
         }
