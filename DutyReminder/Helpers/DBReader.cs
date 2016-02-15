@@ -18,7 +18,6 @@ namespace DutyBot
         #endif
 
         
-        
         public static string readbot()
         {
             string a;

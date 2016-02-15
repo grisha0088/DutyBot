@@ -62,8 +62,12 @@ namespace DutyBot
                 Logger.LogOpperation("info", 1, "StartService", "");
 
                 Bot = new TelegramBot(DBReader.readbot());
-                readmess = new Thread(new ThreadStart(this.readmessages));
-                readmess.Start();
+                
+                ReadmessageThread = new Thread(new ThreadStart(this.readmessages));  //запускаю поток по считыванию и обработке сообщений из telegramm
+                ReadmessageThread.Start();
+
+                CheckTicketsThread = new Thread(new ThreadStart(this.checkjira));   //запускаю поток по проверке тикетов в jira
+                CheckTicketsThread.Start();
                 
             }
             catch (Exception ex)
@@ -90,12 +94,13 @@ namespace DutyBot
             }
         }
 
-        Thread readmess;  //поток читает и обрабатывает сообщения из telegramm        
+        Thread ReadmessageThread;  //поток читает и обрабатывает сообщения из telegramm        
         Thread CheckTicketsThread; //поток проверяет есть ли тикеты в jira-фильтре 
         TelegramBot Bot;
         Jira jiraConn;
         Issue issue;
         Issue ticket;
+        
         bool readmessagesflag = true;
         bool checkjiraflag = true;
 
@@ -106,11 +111,13 @@ namespace DutyBot
 
             while (checkjiraflag)
             {
+                try
+                {
+                
                 var u = DBReader.readallpeople();
                 
                 // если дежурство закончилось, меняем статус на 3
-                try
-                {
+              
                     for (int i = 0; i < u.GetLength(0); i++)
                     {
                         if (DBReader.readdutyend(u[i]) < DateTime.Now & (DBReader.readuserstate(u[i]) == 5))
@@ -122,7 +129,7 @@ namespace DutyBot
                 }
                 catch (Exception ex)
                 {
-                    Logger.LogException("error", 1, "FinishDuty", ex.GetType() + ": " + ex.Message, u.ToString());
+                    Logger.LogException("error", 1, "FinishDuty", ex.GetType() + ": " + ex.Message, "");
                 }
 
 
@@ -196,8 +203,6 @@ namespace DutyBot
         public void readmessages()
         {
             var offset = 0;  //id последнего прочитанного сообщения из telegramm
-            CheckTicketsThread = new Thread(new ThreadStart(this.checkjira));
-            CheckTicketsThread.Start();
 
 
             // в бесконечном цикле начинаю вычитывать сообщения из telegramm
@@ -210,7 +215,7 @@ namespace DutyBot
                     foreach (var result in updates.result)
                     {
 
-                        processmessage(result.message, CheckTicketsThread);
+                        processmessage(result.message);
                         offset = result.update_id + 1;
                     }
 
@@ -224,7 +229,7 @@ namespace DutyBot
             }
         }
 
-        void processmessage(Message message, Thread CheckTicketsThread)
+        void processmessage(Message message)
         {
 
             try
@@ -512,7 +517,7 @@ namespace DutyBot
             catch (Exception ex)
             {
                 DBReader.updateuserstate(message.chat.id, 3);
-                Bot.SendMessage(message.chat.id, "Что-то пошло не так. Останавливаю мониторинг.", "{\"keyboard\": [[\"Проверь тикеты\"], [\"Кто сейчас дежурит?\"], [\"Помоги с дежурством\"], [\"Пока ничего\"]],\"resize_keyboard\":true,\"one_time_keyboard\":true}");
+                Bot.SendMessage(message.chat.id, "Что-то пошло не так при обработке сообщения.", "{\"keyboard\": [[\"Проверь тикеты\"], [\"Кто сейчас дежурит?\"], [\"Помоги с дежурством\"], [\"Пока ничего\"]],\"resize_keyboard\":true,\"one_time_keyboard\":true}");
 
                 Logger.LogException("error", message.chat.id, "ProcessMessage", ex.Message, "");
                 Thread.Sleep(5000);
