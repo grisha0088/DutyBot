@@ -25,3 +25,17 @@ D:\Projects\DutyBot_service\DutyReminder\bin\Debug\Atlassian.Jira.xml
 D:\Projects\DutyBot_service\DutyReminder\bin\Debug\Newtonsoft.Json.xml
 D:\Projects\DutyBot_service\DutyReminder\bin\Debug\RestSharp.xml
 D:\Projects\DutyBot_service\DutyReminder\obj\Debug\DutyBot.csprojResolveAssemblyReference.cache
+D:\Projects\Git\DutyBot\DutyReminder\bin\Debug\DutyBot.exe.config
+D:\Projects\Git\DutyBot\DutyReminder\obj\Debug\DutyBot.exe
+D:\Projects\Git\DutyBot\DutyReminder\obj\Debug\DutyBot.pdb
+D:\Projects\Git\DutyBot\DutyReminder\bin\Debug\DutyBot.exe
+D:\Projects\Git\DutyBot\DutyReminder\bin\Debug\DutyBot.pdb
+D:\Projects\Git\DutyBot\DutyReminder\bin\Debug\Atlassian.Jira.dll
+D:\Projects\Git\DutyBot\DutyReminder\bin\Debug\Newtonsoft.Json.dll
+D:\Projects\Git\DutyBot\DutyReminder\bin\Debug\RestSharp.dll
+D:\Projects\Git\DutyBot\DutyReminder\bin\Debug\Topshelf.dll
+D:\Projects\Git\DutyBot\DutyReminder\bin\Debug\Atlassian.Jira.pdb
+D:\Projects\Git\DutyBot\DutyReminder\bin\Debug\Atlassian.Jira.xml
+D:\Projects\Git\DutyBot\DutyReminder\bin\Debug\Newtonsoft.Json.xml
+D:\Projects\Git\DutyBot\DutyReminder\bin\Debug\RestSharp.xml
+D:\Projects\Git\DutyBot\DutyReminder\obj\Debug\DutyBot.csprojResolveAssemblyReference.cache

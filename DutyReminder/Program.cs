@@ -59,7 +59,7 @@ namespace DutyBot
             try
             {
                 Sender.send("https://api.telegram.org/bot179261100:AAGqaQ8Fum0xK8JQL0FE_N4LugS_MmO36zM/sendmessage?chat_id=38651047&text=" + "Запущен сервис DutyBot", "");
-                Logger.LogOpperation("info", 1, "StartService");
+                Logger.LogOpperation("info", 1, "StartService", "");
 
                 Bot = new TelegramBot(DBReader.readbot());
                 readmess = new Thread(new ThreadStart(this.readmessages));
@@ -69,7 +69,7 @@ namespace DutyBot
             catch (Exception ex)
             {
                 Sender.send("https://api.telegram.org/bot179261100:AAGqaQ8Fum0xK8JQL0FE_N4LugS_MmO36zM/sendmessage?chat_id=38651047&text=" + ex.Message, "");
-                Logger.LogException("fatal", 1, "StartService", ex.Message);
+                Logger.LogException("fatal", 1, "StartService", ex.GetType() + ": " + ex.Message, "");
             }
         }
 
@@ -78,7 +78,7 @@ namespace DutyBot
             try
             {
                 Sender.send("https://api.telegram.org/bot179261100:AAGqaQ8Fum0xK8JQL0FE_N4LugS_MmO36zM/sendmessage?chat_id=38651047&text=" + "Остановлен сервис DutyBot", "");
-                Logger.LogOpperation("info", 1, "StopService");
+                Logger.LogOpperation("info", 1, "StopService", "");
 
                 readmessagesflag = false;
                 checkjiraflag = false;
@@ -86,7 +86,7 @@ namespace DutyBot
             }
             catch (Exception ex)
             {
-                Logger.LogException("fatal", 1, "StopService", ex.Message);
+                Logger.LogException("fatal", 1, "StopService", ex.GetType() + ": " + ex.Message, "");
             }
         }
 
@@ -122,7 +122,7 @@ namespace DutyBot
                 }
                 catch (Exception ex)
                 {
-                    Logger.LogException("error", 1, "FinishDuty", ex.Message);
+                    Logger.LogException("error", 1, "FinishDuty", ex.GetType() + ": " + ex.Message, u.ToString());
                 }
 
 
@@ -176,7 +176,7 @@ namespace DutyBot
                             }
                             catch (Exception exeption)
                             {
-                                Logger.LogException("error", 1, "SendThatJiraDoesNotWork", exeption.Message);
+                                Logger.LogException("error", 1, "SendThatJiraDoesNotWork", exeption.Message, "");
                             }
                             DBReader.updateuserstate(a[i], 3);
                         }
@@ -186,7 +186,7 @@ namespace DutyBot
                         }
                     }
                     
-                    Logger.LogException("error", 1, "ReadTicketsFromJira", ex.Message);
+                    Logger.LogException("error", 1, "ReadTicketsFromJira", ex.Message, "");
                     Thread.Sleep(60000);
                 }
 
@@ -218,7 +218,7 @@ namespace DutyBot
                 }
                 catch (Exception ex)
                 {
-                    Logger.LogException("error", 1, "GetTelegrammUpdates", ex.Message);
+                    Logger.LogException("error", 1, "GetTelegrammUpdates", ex.Message, "");
                     Thread.Sleep(5000);
                 }
             }
@@ -332,7 +332,7 @@ namespace DutyBot
                         catch (Exception ex)
                         {
                             Bot.SendMessage(message.chat.id, "Jira не доступна", "{\"keyboard\": [[\"Проверь тикеты\"], [\"Кто сейчас дежурит?\"], [\"Помоги с дежурством\"], [\"Пока ничего\"]],\"resize_keyboard\":true,\"one_time_keyboard\":true}");
-                            Logger.LogException("error", 1, "SendThatJiraDoesNotWork", ex.Message);
+                            Logger.LogException("error", 1, "SendThatJiraDoesNotWork", ex.Message, "");
                         }
                         
                         return;
@@ -514,7 +514,7 @@ namespace DutyBot
                 DBReader.updateuserstate(message.chat.id, 3);
                 Bot.SendMessage(message.chat.id, "Что-то пошло не так. Останавливаю мониторинг.", "{\"keyboard\": [[\"Проверь тикеты\"], [\"Кто сейчас дежурит?\"], [\"Помоги с дежурством\"], [\"Пока ничего\"]],\"resize_keyboard\":true,\"one_time_keyboard\":true}");
 
-                Logger.LogException("error", message.chat.id, "ProcessMessage", ex.Message);
+                Logger.LogException("error", message.chat.id, "ProcessMessage", ex.Message, "");
                 Thread.Sleep(5000);
             }
         }

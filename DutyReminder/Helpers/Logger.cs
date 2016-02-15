@@ -16,12 +16,12 @@ namespace DutyBot
         static string dutyBotDB = "Data Source=uk-duty01\\duty01;Initial Catalog=DutyBot; Integrated Security=false; User ID=DutyBot; Password=123qwe!;";
         #endif
 
-        public static void LogOpperation(string MessageTipe, int UserID, string Operation)
+        public static void LogOpperation(string MessageTipe, int UserID, string Operation, string AddInfo)
         {
 
             string query = @"
-INSERT INTO [dbo].[Log]([MessageTipe], [UserID], [Operation], [Exception])
-VALUES ('" + MessageTipe + "', " + UserID + ", '" + Operation + "',  null )";
+INSERT INTO [dbo].[Log]([MessageTipe], [UserID], [Operation], [Exception], [AddInfo])
+VALUES ('" + MessageTipe + "', " + UserID + ", '" + Operation + "',  null, '" + AddInfo + "' )";
             using (SqlConnection conn = new SqlConnection(dutyBotDB))
             {
                 conn.Open();
@@ -34,12 +34,12 @@ VALUES ('" + MessageTipe + "', " + UserID + ", '" + Operation + "',  null )";
         
         }
 
-        public static void LogException(string MessageTipe, int UserID, string Operation, string Exception)
+        public static void LogException(string MessageTipe, int UserID, string Operation, string Exception, string AddInfo)
         {
 
             string query = @"
-INSERT INTO [dbo].[Log]([MessageTipe], [UserID], [Operation], [Exception])
-VALUES ('" + MessageTipe + "', " + UserID + ", '" + Operation + "', '" + Exception + "')";
+INSERT INTO [dbo].[Log]([MessageTipe], [UserID], [Operation], [Exception], [AddInfo])
+VALUES ('" + MessageTipe + "', " + UserID + ", '" + Operation + "', '" + Exception + "', '" + AddInfo + "' )";
             using (SqlConnection conn = new SqlConnection(dutyBotDB))
             {
                 conn.Open();

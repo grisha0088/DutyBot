@@ -65,9 +65,9 @@
     <Compile Include="Telegram\Bot.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Telegram\Helpers\Logger.cs" />
+    <Compile Include="Helpers\Logger.cs" />
     <Compile Include="Telegram\Helpers\UrlClearer.cs" />
-    <Compile Include="Telegram\Helpers\DBReader.cs" />
+    <Compile Include="Helpers\DBReader.cs" />
     <Compile Include="Telegram\Helpers\Sender.cs" />
   </ItemGroup>
   <ItemGroup>
