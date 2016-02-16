@@ -17,8 +17,17 @@ namespace DutyBot
         static string dutyBotDB = "Data Source=uk-duty01\\duty01;Initial Catalog=DutyBot; Integrated Security=false; User ID=DutyBot; Password=123qwe!;";
         #endif
 
+        static void MessageClearer(string Message)
+        {
+            Message = Message.Replace("'", "''");
+        }
+        
+        
         public static void LogOpperation(string MessageTipe, int UserID, string Operation, string AddInfo)
         {
+            MessageClearer(MessageTipe);
+            MessageClearer(Operation);
+            MessageClearer(AddInfo);
 
             try
             {
@@ -44,7 +53,11 @@ VALUES ('" + MessageTipe + "', " + UserID + ", '" + Operation + "',  null, '" + 
 
         public static void LogException(string MessageTipe, int UserID, string Operation, string Exception, string AddInfo)
         {
-
+            MessageClearer(MessageTipe);
+            MessageClearer(Operation);
+            MessageClearer(Exception);
+            MessageClearer(AddInfo);
+            
             try
             {
                 string query = @"

@@ -35,13 +35,15 @@ namespace DutyBot
                     x.SetDescription("Service for telegramm DutyBot");
                     x.SetDisplayName("DutyBot");
                     x.SetServiceName("DutyBot");
+                    x.StartAutomatically(); // Start the service automatically
+                    x.StartAutomaticallyDelayed();
                 });
 
 
             }
             catch (Exception ex)
             {
-                Sender.send("https://api.telegram.org/bot179261100:AAGqaQ8Fum0xK8JQL0FE_N4LugS_MmO36zM/sendmessage?chat_id=38651047&text=" + ex, "");
+                Sender.send("https://api.telegram.org/bot179261100:AAGqaQ8Fum0xK8JQL0FE_N4LugS_MmO36zM/sendmessage?chat_id=38651047&text=Ошибка при старте DutyBot: " + ex, "");
 
             }
             
