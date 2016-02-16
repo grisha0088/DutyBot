@@ -35,7 +35,6 @@ namespace DutyBot
                     x.SetDescription("Service for telegramm DutyBot");
                     x.SetDisplayName("DutyBot");
                     x.SetServiceName("DutyBot");
-                    x.StartAutomatically(); // Start the service automatically
                     x.StartAutomaticallyDelayed();
                 });
 
