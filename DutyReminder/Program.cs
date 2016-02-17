@@ -61,10 +61,13 @@ namespace DutyBot
                 try
                 {
                     Logger.LogOpperation("info", 1, "StartService", "");
+                    Sender.send("https://api.telegram.org/bot179261100:AAGqaQ8Fum0xK8JQL0FE_N4LugS_MmO36zM/sendmessage?chat_id=38651047&text=Ошибка при записи в лог, на этапе старта приложения:" + ex, "");
                 }
                 catch(Exception ex)
                 {
-
+                    Thread.Sleep(10000);
+                    Logger.LogOpperation("info", 1, "StartService", "");
+                    Sender.send("https://api.telegram.org/bot179261100:AAGqaQ8Fum0xK8JQL0FE_N4LugS_MmO36zM/sendmessage?chat_id=38651047&text=Подождал 10 секунд, но ошибка осталась: " + ex, "");
                 }
 
                 Bot = new TelegramBot(DBReader.readbot());

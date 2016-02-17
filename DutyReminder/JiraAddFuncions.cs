@@ -1,12 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.IO;
-using System.Net;
 using Telegram;
-using System.Threading;
 using Atlassian.Jira;
 
 namespace DutyBot
@@ -38,7 +31,7 @@ namespace DutyBot
 
                         DBReader.updateticket(message.chat.id, " ");
                         DBReader.updateuserstate(message.chat.id, 3);
-                        Bot.SendMessage(message.chat.id, "Готово", keyboard);
+                        Bot.SendMessage(message.chat.id, "Готово.", keyboard);
 
                         return;
 
