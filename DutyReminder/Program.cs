@@ -1,15 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.IO;
-using System.Net;
 using Telegram;
 using System.Threading;
 using Atlassian.Jira;
 using Topshelf;
-using System.Diagnostics;
 
 namespace DutyBot
 {
@@ -60,7 +55,17 @@ namespace DutyBot
             try
             {
                 Sender.send("https://api.telegram.org/bot179261100:AAGqaQ8Fum0xK8JQL0FE_N4LugS_MmO36zM/sendmessage?chat_id=38651047&text=" + "Запущен сервис DutyBot", "");
-                Logger.LogOpperation("info", 1, "StartService", "");
+
+                Thread.Sleep(10000); // 
+
+                try
+                {
+                    Logger.LogOpperation("info", 1, "StartService", "");
+                }
+                catch(Exception ex)
+                {
+
+                }
 
                 Bot = new TelegramBot(DBReader.readbot());
                 
