@@ -129,7 +129,6 @@ namespace DutyBot
                 {
                 
                 var u = DBReader.readallpeople();
-                
                 // если дежурство закончилось, меняем статус на 3
               
                     for (int i = 0; i < u.GetLength(0); i++)
