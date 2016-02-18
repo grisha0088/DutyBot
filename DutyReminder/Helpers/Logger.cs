@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Data.SqlClient;
 using Telegram;
 
@@ -17,23 +13,23 @@ namespace DutyBot
         static string dutyBotDB = "Data Source=uk-duty01\\duty01;Initial Catalog=DutyBot; Integrated Security=false; User ID=DutyBot; Password=123qwe!;";
         #endif
 
-        static void MessageClearer(string Message)
+        static void MessageClearer(string message)
         {
-            Message = Message.Replace("'", "''");
+            message = message.Replace("'", "''");
         }
         
         
-        public static void LogOpperation(string MessageTipe, int UserID, string Operation, string AddInfo)
+        public static void LogOpperation(string messageTipe, int userId, string operation, string addInfo)
         {
-            MessageClearer(MessageTipe);
-            MessageClearer(Operation);
-            MessageClearer(AddInfo);
+            MessageClearer(messageTipe);
+            MessageClearer(operation);
+            MessageClearer(addInfo);
 
             try
             {
                 string query = @"
-INSERT INTO [dbo].[Log]([MessageTipe], [UserID], [Operation], [Exception], [AddInfo])
-VALUES ('" + MessageTipe + "', " + UserID + ", '" + Operation + "',  null, '" + AddInfo + "' )";
+INSERT INTO [dbo].[Log]([messageTipe], [userId], [operation], [exception], [addInfo])
+VALUES ('" + messageTipe + "', " + userId + ", '" + operation + "',  null, '" + addInfo + "' )";
                 using (SqlConnection conn = new SqlConnection(dutyBotDB))
                 {
                     conn.Open();
@@ -46,23 +42,23 @@ VALUES ('" + MessageTipe + "', " + UserID + ", '" + Operation + "',  null, '" + 
             }
             catch (Exception ex)
             {
-                Sender.send("https://api.telegram.org/bot179261100:AAGqaQ8Fum0xK8JQL0FE_N4LugS_MmO36zM/sendmessage?chat_id=38651047&text=" + "Ошибка при записи операции в лог: " + ex, "");
+                Sender.Send("https://api.telegram.org/bot179261100:AAGqaQ8Fum0xK8JQL0FE_N4LugS_MmO36zM/sendmessage?chat_id=38651047&text=" + "Ошибка при записи операции в лог: " + ex);
             }
         
         }
 
-        public static void LogException(string MessageTipe, int UserID, string Operation, string Exception, string AddInfo)
+        public static void LogException(string messageTipe, int userId, string operation, string exception, string addInfo)
         {
-            MessageClearer(MessageTipe);
-            MessageClearer(Operation);
-            MessageClearer(Exception);
-            MessageClearer(AddInfo);
+            MessageClearer(messageTipe);
+            MessageClearer(operation);
+            MessageClearer(exception);
+            MessageClearer(addInfo);
             
             try
             {
                 string query = @"
-INSERT INTO [dbo].[Log]([MessageTipe], [UserID], [Operation], [Exception], [AddInfo])
-VALUES ('" + MessageTipe + "', " + UserID + ", '" + Operation + "', '" + Exception + "', '" + AddInfo + "' )";
+INSERT INTO [dbo].[Log]([messageTipe], [userId], [operation], [exception], [addInfo])
+VALUES ('" + messageTipe + "', " + userId + ", '" + operation + "', '" + exception + "', '" + addInfo + "' )";
                 using (SqlConnection conn = new SqlConnection(dutyBotDB))
                 {
                     conn.Open();
@@ -75,7 +71,7 @@ VALUES ('" + MessageTipe + "', " + UserID + ", '" + Operation + "', '" + Excepti
             }
             catch (Exception ex)
             {
-                Sender.send("https://api.telegram.org/bot179261100:AAGqaQ8Fum0xK8JQL0FE_N4LugS_MmO36zM/sendmessage?chat_id=38651047&text=" + "Ошибка при записи ошибки в лог: " + ex, "");
+                Sender.Send("https://api.telegram.org/bot179261100:AAGqaQ8Fum0xK8JQL0FE_N4LugS_MmO36zM/sendmessage?chat_id=38651047&text=" + "Ошибка при записи ошибки в лог: " + ex);
             }
         }
 
