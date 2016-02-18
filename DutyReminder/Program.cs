@@ -150,7 +150,6 @@ namespace DutyBot
                 try
                 {
                     issues = jiraConn.GetIssuesFromJql(DBReader.readfilter());
-                  
                     if (issues.Count() > 0 && DBReader.readrespcount() > 0)
                     {
                         ticket = issues.First();
@@ -159,7 +158,6 @@ namespace DutyBot
 
                         for (int i = 0; i < a.GetLength(0); i++)
                         {
-
                             if (a[i] != 0 & ticket.Assignee == null)
                             {
                                 jiraConn = Jira.CreateRestClient(DBReader.readjira(), DBReader.readuserlogin(a[i]), DBReader.readuserpassword(a[i]));
@@ -179,7 +177,6 @@ namespace DutyBot
                         Thread.Sleep(10000);
                     }
 
-
                 }
                 catch (Exception ex)
                 {
@@ -187,7 +184,6 @@ namespace DutyBot
 
                     for (int i = 0; i < a.GetLength(0); i++)
                     {
-
                         if (a[i] != 0)
                         {
                             try
