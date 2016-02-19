@@ -85,7 +85,6 @@ namespace DutyBot
 
                 _readmessagesflag = false;
                 _checkjiraflag = false;
-                
             }
             catch (Exception ex)
             {
@@ -109,7 +108,6 @@ namespace DutyBot
             {
                 try
                 {
-                
                 var u = DbReader.Readallpeople();
                 // если дежурство закончилось, меняем статус на 3
               
@@ -118,7 +116,6 @@ namespace DutyBot
                         if (DbReader.Readdutyend(u[i]) < DateTime.Now & (DbReader.Readuserstate(u[i]) == 5))
                         {
                             DbReader.Updateuserstate(u[i], 3);
-
                         }
                     }
                 }
@@ -136,10 +133,9 @@ namespace DutyBot
                     if (enumerable.Any() && DbReader.Readrespcount() > 0)
                     {
                         _ticket = enumerable.Last();
-                        
                         var a = DbReader.Readresppeople();
 
-                        for (int i = 0; i < a.GetLength(0); i++)
+                        for (var i = 0; i < a.GetLength(0); i++)
                         {
                             if (a[i] != 0 & _ticket.Assignee == null)
                             {
@@ -186,7 +182,7 @@ namespace DutyBot
                     }
                     
                     Logger.LogException("error", 1, "ReadTicketsFromJira", ex.Message, "");
-                    Thread.Sleep(60000);
+                    Thread.Sleep(30000);
                 }
             }
         }
@@ -204,7 +200,6 @@ namespace DutyBot
                         Processmessage(result.message);
                         offset = result.update_id + 1;
                     }
-
                     Thread.Sleep(1000);
                 }
                 catch (Exception ex)
@@ -217,17 +212,13 @@ namespace DutyBot
 
         private void Processmessage(Message message)
         {
-
             try
             {
-
                 switch (DbReader.Readuserstate(message.chat.id))
                 {
                     case -1:
                         _bot.SendMessage(message.chat.id, "Привет, " + message.chat.first_name + @"! Меня зовут DutyBot, я создан, чтобы помогать дежурить. Давай знакомиться!
  ", "{\"keyboard\": [[\"Рассказать DutyBot'у о себе\"], [\"Не хочу знакомиться, ты мне не нравишься\"]],\"resize_keyboard\":true,\"one_time_keyboard\":true}");
-
-
                         DbReader.Insertuser(message.chat.first_name, message.chat.id);
                         return;
                     case 0:
@@ -270,7 +261,7 @@ namespace DutyBot
                             return;
                         }
                     case 3:
-                        switch ((message.text))
+                        switch (message.text)
                         {
                             case "Начнём":
                                 _bot.SendMessage(message.chat.id, "Просто напиши мне сообщение, когда я тебе понадоблюсь. В ответ я пришлю меню с вариантами моих действий. Вот такое ↓", "{\"keyboard\": [[\"Кто сейчас дежурит?\"], [\"Проверь тикеты\"], [\"Помоги с дежурством\"], [\"Пока ничем\"]],\"resize_keyboard\":true,\"one_time_keyboard\":true}");
@@ -330,22 +321,18 @@ namespace DutyBot
                                 else
                                 {
                                     _bot.SendMessage(message.chat.id, "Я буду мониторить тикеты с " + DbReader.Readuserdutystart(message.chat.id).ToShortDateString() + " " + DbReader.Readuserdutystart(message.chat.id).ToShortTimeString() + " по " + DbReader.Readuserdutyend(message.chat.id).ToShortDateString() + " " + DbReader.Readuserdutyend(message.chat.id).ToShortTimeString());
-
                                     DbReader.Updateuserstate(message.chat.id, 5);
                                     DbReader.Updatedutystart(message.chat.id, DbReader.Readuserdutystart(message.chat.id));
                                     DbReader.Updatedutyend(message.chat.id, DbReader.Readuserdutyend(message.chat.id));
                                     return;
                                 }
                         }
-
-
                         _bot.SendMessage(message.chat.id, "Чем я могу помочь?", "{\"keyboard\": [[\"Проверь тикеты\"], [\"Кто сейчас дежурит?\"], [\"Помоги с дежурством\"], [\"Пока ничего\"]],\"resize_keyboard\":true,\"one_time_keyboard\":true}");
                         return;
                     case 4:
 
                         if (_issue.Key.ToString().Equals(DbReader.Readticket(message.chat.id)))
                         {
-
                             switch ((message.text))
                             {
                                 case "Распределить":
@@ -400,7 +387,6 @@ namespace DutyBot
                                     JiraAddFuncions.AssingTicket(_issue, message, "p.denisov", _bot, _jiraConn);
                                     break;
                             }
-
                         }
                         else
                         {
@@ -454,7 +440,6 @@ namespace DutyBot
 
                             case ("Остановить мониторинг"):
                                 {
-
                                     _bot.SendMessage(message.chat.id, "Готово");
                                     DbReader.Updateuserstate(message.chat.id, 3);
                                     break;

@@ -4,7 +4,7 @@ using Atlassian.Jira;
 
 namespace Telegram
 {
-    internal class TelegramBot 
+    public class TelegramBot 
     {
         readonly string _botkey;
         public TelegramBot(string botkey)
@@ -36,7 +36,6 @@ namespace Telegram
             " + tc.Reporter + @"
             " + tc.Summary + @"
             " + tc.Description, "{\"keyboard\": [[\"Распределить\"], [\"Решить\"], [\"Назначить себе\"]],\"resize_keyboard\":true,\"one_time_keyboard\":true}");
-   
         }
 
         public updates Getupdates(int offset)
