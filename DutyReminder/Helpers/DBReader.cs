@@ -1,26 +1,21 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Data.SqlClient;
 
 
 namespace DutyBot
 {
-    class DBReader
+    class DbReader
     {
         #if DEBUG
-        static string dutyBotDB = "Data Source=uk-duty01\\duty01;Initial Catalog=DutyBot_debug; Integrated Security=false; User ID=DutyBot; Password=123qwe!;";
+        static readonly string dutyBotDB = "Data Source=uk-duty01\\duty01;Initial Catalog=DutyBot_debug; Integrated Security=false; User ID=DutyBot; Password=123qwe!;";
 
         #else
-        static string dutyBotDB = "Data Source=uk-duty01\\duty01;Initial Catalog=DutyBot; Integrated Security=false; User ID=DutyBot; Password=123qwe!;";
+        static readonly string dutyBotDB = "Data Source=uk-duty01\\duty01;Initial Catalog=DutyBot; Integrated Security=false; User ID=DutyBot; Password=123qwe!;";
         #endif
 
-        
-        public static string readbot()
+
+        public static string Readbot()
         {
-            string a;
             string query = @"
      SELECT [ValueString]
   FROM  [dbo].[Parametrs]
@@ -30,35 +25,32 @@ namespace DutyBot
                 conn.Open();
                 using (SqlCommand todc1 = new SqlCommand(query, conn))
                 {
-
-                    a = (string)todc1.ExecuteScalar();
+                    var a = (string)todc1.ExecuteScalar();
                     return a;
                 }
             }
         }
 
-        public static string readticket(int user_id)
+        public static string Readticket(int userId)
         {
-            string a;
-            string query = @"
+            var query = @"
      SELECT [TicketNumber]
   FROM  [dbo].[Users]
-  where [id] = " + user_id;
+  where [id] = " + userId;
             using (SqlConnection conn = new SqlConnection(dutyBotDB))
             {
                 conn.Open();
                 using (SqlCommand todc1 = new SqlCommand(query, conn))
                 {
-
-                    a = (string)todc1.ExecuteScalar();
+                    var a = (string)todc1.ExecuteScalar();
                     return a;
                 }
             }
         }
 
-        public static void updateticket(int user_id, string ticket)
+        public static void Updateticket(int userId, string ticket)
         {
-            string query = "UPDATE [dbo].[Users] SET [TicketNumber] = '" + ticket + "' WHERE [id] =" + user_id;
+            string query = "UPDATE [dbo].[Users] SET [TicketNumber] = '" + ticket + "' WHERE [id] =" + userId;
             using (SqlConnection conn = new SqlConnection(dutyBotDB))
             {
                 conn.Open();
@@ -72,10 +64,9 @@ namespace DutyBot
         }
 
 
-        public static string readjira()
+        public static string Readjira()
         {
-            string a;
-            string query = @"
+            const string query = @"
      SELECT [ValueString]
   FROM  [dbo].[Parametrs]
   where Parametr = 'jira'";
@@ -84,17 +75,15 @@ namespace DutyBot
                 conn.Open();
                 using (SqlCommand todc1 = new SqlCommand(query, conn))
                 {
-
-                    a = (string)todc1.ExecuteScalar();
+                    var a = (string)todc1.ExecuteScalar();
                     return a;
                 }
             }
         }
 
-        public static string readdefaultuser()
+        public static string Readdefaultuser()
         {
-            string a;
-            string query = @"
+            const string query = @"
      SELECT [ValueString]
   FROM  [dbo].[Parametrs]
   where Parametr = 'dafaultuserlogin'";
@@ -103,17 +92,15 @@ namespace DutyBot
                 conn.Open();
                 using (SqlCommand todc1 = new SqlCommand(query, conn))
                 {
-
-                    a = (string)todc1.ExecuteScalar();
+                    var a = (string)todc1.ExecuteScalar();
                     return a;
                 }
             }
         }
 
-        public static string readdefaultpassword()
+        public static string Readdefaultpassword()
         {
-            string a;
-            string query = @"
+            const string query = @"
      SELECT [ValueString]
   FROM  [dbo].[Parametrs]
   where Parametr = 'dafaultuserpassword'";
@@ -122,14 +109,13 @@ namespace DutyBot
                 conn.Open();
                 using (SqlCommand todc1 = new SqlCommand(query, conn))
                 {
-
-                    a = (string)todc1.ExecuteScalar();
+                    var a = (string)todc1.ExecuteScalar();
                     return a;
                 }
             }
         }
 
-        public static string readfilter()
+        public static string Readfilter()
         {
             string a;
             string query = @"
@@ -149,21 +135,19 @@ namespace DutyBot
         }
 
 
-        public static DateTime readdutyend(int user_id)
+        public static DateTime Readdutyend(int userId)
         {
-            DateTime a;
-            string query = @"
+            var query = @"
 declare @a datetime	=	
-(SELECT[DutyEnd] FROM  [dbo].[Users]  where [id] = " +  user_id + @")
+(SELECT[DutyEnd] FROM  [dbo].[Users]  where [id] = " +  userId + @")
 select ISNULL(@a, '1900-01-01 00:00:00.000')";
             using (SqlConnection conn = new SqlConnection(dutyBotDB))
             {
                 conn.Open();
-                using (SqlCommand todc1 = new SqlCommand(query, conn))
+                using (var todc1 = new SqlCommand(query, conn))
                 {
+                    var a = (DateTime)todc1.ExecuteScalar();
 
-                    a = (DateTime)todc1.ExecuteScalar();
-                    
                     return a;
                 }
             }
@@ -171,10 +155,10 @@ select ISNULL(@a, '1900-01-01 00:00:00.000')";
             
         
 
-        public static int[] readresppeople()
+        public static int[] Readresppeople()
         {
-            int[] users = new int[20];
-            using (SqlConnection conn = new SqlConnection(dutyBotDB))
+            var users = new int[20];
+            using (var conn = new SqlConnection(dutyBotDB))
             {
                 SqlCommand command = new SqlCommand(
                   @"SELECT [id]
@@ -185,7 +169,7 @@ select ISNULL(@a, '1900-01-01 00:00:00.000')";
 
                 SqlDataReader reader = command.ExecuteReader();
                 
-                int i = 0;
+                var i = 0;
 
                 if (reader.HasRows)
                 {
@@ -201,12 +185,12 @@ select ISNULL(@a, '1900-01-01 00:00:00.000')";
             return users;
         }
 
-        public static int[] readallpeople()
+        public static int[] Readallpeople()
         {
-            int[] users = new int[20];
-            using (SqlConnection conn = new SqlConnection(dutyBotDB))
+            var users = new int[20];
+            using (var conn = new SqlConnection(dutyBotDB))
             {
-                SqlCommand command = new SqlCommand(
+                var command = new SqlCommand(
                   @"SELECT [id]
                     FROM  [dbo].[Users]",
                   conn);
@@ -214,7 +198,7 @@ select ISNULL(@a, '1900-01-01 00:00:00.000')";
 
                 SqlDataReader reader = command.ExecuteReader();
 
-                int i = 0;
+                var i = 0;
 
                 if (reader.HasRows)
                 {
@@ -232,29 +216,24 @@ select ISNULL(@a, '1900-01-01 00:00:00.000')";
             return users;
         }
 
-         public static int readrespcount()
-        {
-            int a;
-            string query = @"SELECT count([id])
+         public static int Readrespcount()
+         {
+             const string query = @"SELECT count([id])
   FROM  [dbo].[Users]
   where [DutyEnd] > getdate()";
-            using (SqlConnection conn = new SqlConnection(dutyBotDB))
+             using (var conn = new SqlConnection(dutyBotDB))
             {
                 conn.Open();
-                using (SqlCommand todc1 = new SqlCommand(query, conn))
+                using (var todc1 = new SqlCommand(query, conn))
                 {
-
-                    a = (int)todc1.ExecuteScalar();
-
-
+                    var a = (int)todc1.ExecuteScalar();
                     return a;
                 }
             }
-        }
+         }
 
-        public static string readrespersone()
+        public static string Readrespersone()
         {
-            string a;
             string query = @"
      DECLARE @namest as nvarchar(100)
     DECLARE @date as nvarchar(100)
@@ -292,7 +271,7 @@ EXEC(@SQLText)";
                 using (SqlCommand todc1 = new SqlCommand(query, conn))
                 {
 
-                    a = (string)todc1.ExecuteScalar();
+                    var a = (string)todc1.ExecuteScalar();
 
                     if (a == "") a = "Сейчас никто не дежурит";
                     return a;
@@ -300,11 +279,10 @@ EXEC(@SQLText)";
             }
         }
 
-        public static DateTime readuserdutystart(int user_id)
+        public static DateTime Readuserdutystart(int userId)
         {
-            DateTime a;
             string query = @"
-  declare @userid int = " + user_id + @"
+  declare @userid int = " + userId + @"
 
   declare @DutyDate datetime
   declare @First nvarchar(max)
@@ -432,19 +410,17 @@ select isnull(@start, '')      ";
                 conn.Open();
                 using (SqlCommand todc1 = new SqlCommand(query, conn))
                 {
-
-                    a = (DateTime)todc1.ExecuteScalar();
+                    var a = (DateTime)todc1.ExecuteScalar();
                     return a;
                 }
             }
         }
 
 
-        public static DateTime readuserdutyend(int user_id)
+        public static DateTime Readuserdutyend(int userId)
         {
-            DateTime a;
             string query = @"
-  declare @userid int = " + user_id + @"
+  declare @userid int = " + userId + @"
 
   declare @DutyDate datetime
   declare @First nvarchar(max)
@@ -572,28 +548,25 @@ select isnull(@end, '')      ";
                 conn.Open();
                 using (SqlCommand todc1 = new SqlCommand(query, conn))
                 {
-
-                    a = (DateTime)todc1.ExecuteScalar();
+                    var a = (DateTime)todc1.ExecuteScalar();
                     return a;
                 }
             }
         }
 
-        public static int readuserstate(int user_id)
+        public static int Readuserstate(int userId)
         {
-            int a;
-            string query = @"
+            var query = @"
    select isnull((
   SELECT [State]
   FROM  [dbo].[Users]
-  where id = " + user_id + "), -1)";
+  where id = " + userId + "), -1)";
             using (SqlConnection conn = new SqlConnection(dutyBotDB))
             {
                 conn.Open();
                 using (SqlCommand todc1 = new SqlCommand(query, conn))
                 {
-
-                    a = (Int32)todc1.ExecuteScalar();
+                    var a = (int)todc1.ExecuteScalar();
 
 
                     return a;
@@ -601,20 +574,18 @@ select isnull(@end, '')      ";
             }
         }
 
-        public static string readuserlogin(int user_id)
+        public static string Readuserlogin(int userId)
         {
-            string a;
-            string query = @"
+            var query = @"
   SELECT [Login]
   FROM  [dbo].[Users]
-  where id = " + user_id;
-            using (SqlConnection conn = new SqlConnection(dutyBotDB))
+  where id = " + userId;
+            using (var conn = new SqlConnection(dutyBotDB))
             {
                 conn.Open();
-                using (SqlCommand todc1 = new SqlCommand(query, conn))
+                using (var todc1 = new SqlCommand(query, conn))
                 {
-
-                    a = (string)todc1.ExecuteScalar();
+                    var a = (string)todc1.ExecuteScalar();
 
 
                     return a;
@@ -622,20 +593,18 @@ select isnull(@end, '')      ";
             }
         }
 
-        public static string readuserpassword(int user_id)
+        public static string Readuserpassword(int userId)
         {
-            string a;
-            string query = @"
+            var query = @"
   SELECT [Password]
   FROM  [dbo].[Users]
-  where id = " + user_id;
-            using (SqlConnection conn = new SqlConnection(dutyBotDB))
+  where id = " + userId;
+            using (var conn = new SqlConnection(dutyBotDB))
             {
                 conn.Open();
                 using (SqlCommand todc1 = new SqlCommand(query, conn))
                 {
-
-                    a = (string)todc1.ExecuteScalar();
+                    var a = (string)todc1.ExecuteScalar();
 
 
                     return a;
@@ -643,13 +612,13 @@ select isnull(@end, '')      ";
             }
         }
 
-        public static void updateuserlogin(int user_id, string login)
+        public static void Updateuserlogin(int userId, string login)
         {
             string query = @"
    UPDATE [dbo].[Users]
    SET [Login] = '" + login + 
- "' WHERE [id] =" + user_id;
-            using (SqlConnection conn = new SqlConnection(dutyBotDB))
+ "' WHERE [id] =" + userId;
+            using (var conn = new SqlConnection(dutyBotDB))
             {
                 conn.Open();
                 using (SqlCommand todc1 = new SqlCommand(query, conn))
@@ -660,12 +629,12 @@ select isnull(@end, '')      ";
             }
         }
 
-        public static void updateuserpassword(int user_id, string password)
+        public static void Updateuserpassword(int userId, string password)
         {
-            string query = @"
+            var query = @"
    UPDATE [dbo].[Users]
    SET [Password] = '" + password +
- "' WHERE [id] =" + user_id;
+ "' WHERE [id] =" + userId;
             using (SqlConnection conn = new SqlConnection(dutyBotDB))
             {
                 conn.Open();
@@ -677,12 +646,12 @@ select isnull(@end, '')      ";
             }
         }
 
-        public static void updateuserstate(int user_id, int state)
+        public static void Updateuserstate(int userId, int state)
         {
             string query = @"
    UPDATE [dbo].[Users]
    SET [State] =" + state +
- " WHERE [id] =" + user_id;
+ " WHERE [id] =" + userId;
             using (SqlConnection conn = new SqlConnection(dutyBotDB))
             {
                 conn.Open();
@@ -695,9 +664,9 @@ select isnull(@end, '')      ";
             }
         }
 
-        public static void updatedutystart(int user_id, DateTime starttime)
+        public static void Updatedutystart(int userId, DateTime starttime)
         {
-            string query = "UPDATE [dbo].[Users] SET [DutyStart] ='" + starttime + "' WHERE [id] =" + user_id;
+            string query = "UPDATE [dbo].[Users] SET [DutyStart] ='" + starttime + "' WHERE [id] =" + userId;
             using (SqlConnection conn = new SqlConnection(dutyBotDB))
             {
                 conn.Open();
@@ -710,9 +679,9 @@ select isnull(@end, '')      ";
             }
         }
 
-        public static void updatedutyend(int user_id, DateTime endtime)
+        public static void Updatedutyend(int userId, DateTime endtime)
         {
-            string query = "UPDATE [dbo].[Users] SET [DutyEnd] = '" + endtime + "' WHERE [id] =" + user_id;
+            string query = "UPDATE [dbo].[Users] SET [DutyEnd] = '" + endtime + "' WHERE [id] =" + userId;
             using (SqlConnection conn = new SqlConnection(dutyBotDB))
             {
                 conn.Open();
@@ -726,7 +695,7 @@ select isnull(@end, '')      ";
         }
 
 
-        public static void insertuser(string username, int user_id, int userstate = 0)
+        public static void Insertuser(string username, int userId, int userstate = 0)
         {
             string query = @"
   INSERT INTO [dbo].[Users]
@@ -735,7 +704,7 @@ select isnull(@end, '')      ";
            ,[State]
            ,[Login]
            ,[Password])
-     VALUES ('" + username + "', " + user_id + ", " + userstate + ", ' ', ' ')";
+     VALUES ('" + username + "', " + userId + ", " + userstate + ", ' ', ' ')";
   
             using (SqlConnection conn = new SqlConnection(dutyBotDB))
             {
@@ -749,11 +718,11 @@ select isnull(@end, '')      ";
             }
         }
 
-        public static void deletetuser(int user_id)
+        public static void Deletetuser(int userId)
         {
             string query = @"
   delete from [dbo].[Users]
-  where [id] = " + user_id;
+  where [id] = " + userId;
 
             using (SqlConnection conn = new SqlConnection(dutyBotDB))
             {

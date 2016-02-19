@@ -8,14 +8,12 @@ using Topshelf;
 
 namespace DutyBot
 {
-    class Program
+    internal class Program
     {
-
         public static void Main()
         {
             try
             {
-
                 HostFactory.Run(x =>
                 {
                     x.Service<Prog>(s =>
@@ -23,41 +21,29 @@ namespace DutyBot
                         s.ConstructUsing(name => new Prog());
                         s.WhenStarted(tc => tc.Start());
                         s.WhenStopped(tc => tc.Stop());
-
                     });
                     x.RunAsNetworkService();
-
                     x.SetDescription("Service for telegramm DutyBot");
                     x.SetDisplayName("DutyBot");
                     x.SetServiceName("DutyBot");
                     x.StartAutomaticallyDelayed();
                 });
-
-
             }
             catch (Exception ex)
             {
-                Sender.send("https://api.telegram.org/bot179261100:AAGqaQ8Fum0xK8JQL0FE_N4LugS_MmO36zM/sendmessage?chat_id=38651047&text=Ошибка при старте DutyBot: " + ex, "");
-
+                Sender.Send("https://api.telegram.org/bot179261100:AAGqaQ8Fum0xK8JQL0FE_N4LugS_MmO36zM/sendmessage?chat_id=38651047&text=Ошибка при старте DutyBot: " + ex);
             }
-            
         }
-
     }
 
 
-    class Prog
+    internal class Prog
     {
-
         public void Start() //метод вызывается при старте службы
         {
-            
             try
             {
-                Thread.Sleep(10000); // 
-
-                Sender.send("https://api.telegram.org/bot179261100:AAGqaQ8Fum0xK8JQL0FE_N4LugS_MmO36zM/sendmessage?chat_id=38651047&text=" + "Запущен сервис DutyBot", "");
-                
+                Sender.Send("https://api.telegram.org/bot179261100:AAGqaQ8Fum0xK8JQL0FE_N4LugS_MmO36zM/sendmessage?chat_id=38651047&text=" + "Запущен сервис DutyBot");
                 try
                 {
                     Logger.LogOpperation("info", 1, "StartService", "");
@@ -71,36 +57,34 @@ namespace DutyBot
                     }
                     catch
                     {
-                        Sender.send("https://api.telegram.org/bot179261100:AAGqaQ8Fum0xK8JQL0FE_N4LugS_MmO36zM/sendmessage?chat_id=38651047&text=Произошла ошибка при запуске службы. Подождал 10 секунд, но ошибка осталась: " + ex, "");
+                        Sender.Send("https://api.telegram.org/bot179261100:AAGqaQ8Fum0xK8JQL0FE_N4LugS_MmO36zM/sendmessage?chat_id=38651047&text=Произошла ошибка при запуске службы. Подождал 10 секунд, но ошибка осталась: " + ex);
                     }
                 }
 
-                Bot = new TelegramBot(DBReader.readbot());
+                _bot = new TelegramBot(DbReader.Readbot());
                 
-                ReadmessageThread = new Thread(new ThreadStart(this.readmessages));  //запускаю поток по считыванию и обработке сообщений из telegramm
-                ReadmessageThread.Start();
+                _readmessageThread = new Thread(Readmessages);  //запускаю поток по считыванию и обработке сообщений из telegramm
+                _readmessageThread.Start();
 
-                CheckTicketsThread = new Thread(new ThreadStart(this.checkjira));   //запускаю поток по проверке тикетов в jira
-                CheckTicketsThread.Start();
+                _checkTicketsThread = new Thread(Checkjira);   //запускаю поток по проверке тикетов в jira
+                _checkTicketsThread.Start();
                 
             }
             catch (Exception ex)
             {
-                Sender.send("https://api.telegram.org/bot179261100:AAGqaQ8Fum0xK8JQL0FE_N4LugS_MmO36zM/sendmessage?chat_id=38651047&text=" + ex.Message, "");
+                Sender.Send("https://api.telegram.org/bot179261100:AAGqaQ8Fum0xK8JQL0FE_N4LugS_MmO36zM/sendmessage?chat_id=38651047&text=" + ex.Message);
                 Logger.LogException("fatal", 1, "StartService", ex.GetType() + ": " + ex.Message, "");
             }
         }
-
         public void Stop()  //метод вызывается при остановке службы
         {
             try
             {
-                Sender.send("https://api.telegram.org/bot179261100:AAGqaQ8Fum0xK8JQL0FE_N4LugS_MmO36zM/sendmessage?chat_id=38651047&text=" + "Остановлен сервис DutyBot", "");
+                Sender.Send("https://api.telegram.org/bot179261100:AAGqaQ8Fum0xK8JQL0FE_N4LugS_MmO36zM/sendmessage?chat_id=38651047&text=" + "Остановлен сервис DutyBot");
                 Logger.LogOpperation("info", 1, "StopService", "");
 
-                readmessagesflag = false;
-                checkjiraflag = false;
-                
+                _readmessagesflag = false;
+                _checkjiraflag = false;
             }
             catch (Exception ex)
             {
@@ -108,35 +92,30 @@ namespace DutyBot
             }
         }
 
-        Thread ReadmessageThread;  //поток читает и обрабатывает сообщения из telegramm        
-        Thread CheckTicketsThread; //поток проверяет есть ли тикеты в jira-фильтре 
-        TelegramBot Bot;
-        Jira jiraConn;
-        Issue issue;
-        Issue ticket;
-        
-        bool readmessagesflag = true;
-        bool checkjiraflag = true;
+        private Thread _readmessageThread;  //поток читает и обрабатывает сообщения из telegramm        
+        private Thread _checkTicketsThread; //поток проверяет есть ли тикеты в jira-фильтре 
+        private TelegramBot _bot;
+        private Jira _jiraConn;
+        private Issue _issue;
+        private Issue _ticket;
+        private bool _readmessagesflag = true;
+        private bool _checkjiraflag = true;
 
-        public void checkjira()
+        public void Checkjira()
         {
-            jiraConn = Jira.CreateRestClient(DBReader.readjira(), DBReader.readdefaultuser(), DBReader.readdefaultpassword());
-            IEnumerable<Atlassian.Jira.Issue> issues;
-
-            while (checkjiraflag)
+            _jiraConn = Jira.CreateRestClient(DbReader.Readjira(), DbReader.Readdefaultuser(), DbReader.Readdefaultpassword());
+            while (_checkjiraflag)
             {
                 try
                 {
-                
-                var u = DBReader.readallpeople();
+                var u = DbReader.Readallpeople();
                 // если дежурство закончилось, меняем статус на 3
               
                     for (int i = 0; i < u.GetLength(0); i++)
                     {
-                        if (DBReader.readdutyend(u[i]) < DateTime.Now & (DBReader.readuserstate(u[i]) == 5))
+                        if (DbReader.Readdutyend(u[i]) < DateTime.Now & (DbReader.Readuserstate(u[i]) == 5))
                         {
-                            DBReader.updateuserstate(u[i], 3);
-
+                            DbReader.Updateuserstate(u[i], 3);
                         }
                     }
                 }
@@ -149,21 +128,21 @@ namespace DutyBot
                 //вычитываю тикеты из заданного фильтра
                 try
                 {
-                    issues = jiraConn.GetIssuesFromJql(DBReader.readfilter());
-                    if (issues.Count() > 0 && DBReader.readrespcount() > 0)
+                    var issues = _jiraConn.GetIssuesFromJql(DbReader.Readfilter());
+                    var enumerable = issues as IList<Issue> ?? issues.ToList();
+                    if (enumerable.Any() && DbReader.Readrespcount() > 0)
                     {
-                        ticket = issues.First();
-                        
-                        var a = DBReader.readresppeople();
+                        _ticket = enumerable.Last();
+                        var a = DbReader.Readresppeople();
 
-                        for (int i = 0; i < a.GetLength(0); i++)
+                        for (var i = 0; i < a.GetLength(0); i++)
                         {
-                            if (a[i] != 0 & ticket.Assignee == null)
+                            if (a[i] != 0 & _ticket.Assignee == null)
                             {
-                                jiraConn = Jira.CreateRestClient(DBReader.readjira(), DBReader.readuserlogin(a[i]), DBReader.readuserpassword(a[i]));
-                                DBReader.updateticket(a[i], ticket.Key.ToString());
-                                Bot.SendMessage(a[i], ticket);
-                                DBReader.updateuserstate(a[i], 6);
+                                _jiraConn = Jira.CreateRestClient(DbReader.Readjira(), DbReader.Readuserlogin(a[i]), DbReader.Readuserpassword(a[i]));
+                                DbReader.Updateticket(a[i], _ticket.Key.ToString());
+                                _bot.SendMessage(a[i], _ticket);
+                                DbReader.Updateuserstate(a[i], 6);
                             }
                             else
                             {
@@ -180,21 +159,21 @@ namespace DutyBot
                 }
                 catch (Exception ex)
                 {
-                    var a = DBReader.readresppeople();
+                    var a = DbReader.Readresppeople();
 
-                    for (int i = 0; i < a.GetLength(0); i++)
+                    for (var i = 0; i < a.GetLength(0); i++)
                     {
                         if (a[i] != 0)
                         {
                             try
                             {
-                                Bot.SendMessage(a[i], "Похоже, что jira не доступна. Мониторинг остановлен. Что будем делать?", "{\"keyboard\": [[\"Проверь тикеты\"], [\"Кто сейчас дежурит?\"], [\"Помоги с дежурством\"], [\"Пока ничего\"]],\"resize_keyboard\":true,\"one_time_keyboard\":true}");
+                                _bot.SendMessage(a[i], "Похоже, что jira не доступна. Мониторинг остановлен. Что будем делать?", "{\"keyboard\": [[\"Проверь тикеты\"], [\"Кто сейчас дежурит?\"], [\"Помоги с дежурством\"], [\"Пока ничего\"]],\"resize_keyboard\":true,\"one_time_keyboard\":true}");
                             }
                             catch (Exception exeption)
                             {
                                 Logger.LogException("error", 1, "SendThatJiraDoesNotWork", exeption.Message, "");
                             }
-                            DBReader.updateuserstate(a[i], 3);
+                            DbReader.Updateuserstate(a[i], 3);
                         }
                         else
                         {
@@ -203,31 +182,24 @@ namespace DutyBot
                     }
                     
                     Logger.LogException("error", 1, "ReadTicketsFromJira", ex.Message, "");
-                    Thread.Sleep(60000);
+                    Thread.Sleep(30000);
                 }
-
             }
         }
 
-        public void readmessages()
+        public void Readmessages()
         {
             var offset = 0;  //id последнего прочитанного сообщения из telegramm
-
-
-            // в бесконечном цикле начинаю вычитывать сообщения из telegramm
-            while (readmessagesflag)
+            while (_readmessagesflag) // в бесконечном цикле начинаю вычитывать сообщения из telegramm
             {
                 try
                 {
-                    var updates = Bot.getupdates(offset);
-
+                    var updates = _bot.Getupdates(offset);
                     foreach (var result in updates.result)
                     {
-
-                        processmessage(result.message);
+                        Processmessage(result.message);
                         offset = result.update_id + 1;
                     }
-
                     Thread.Sleep(1000);
                 }
                 catch (Exception ex)
@@ -238,295 +210,271 @@ namespace DutyBot
             }
         }
 
-        void processmessage(Message message)
+        private void Processmessage(Message message)
         {
-
             try
             {
-
-                if (DBReader.readuserstate(message.chat.id) == -1)
+                switch (DbReader.Readuserstate(message.chat.id))
                 {
-                    Bot.SendMessage(message.chat.id, "Привет, " + message.chat.first_name + @"! Меня зовут DutyBot, я создан, чтобы помогать дежурить. Давай знакомиться!
+                    case -1:
+                        _bot.SendMessage(message.chat.id, "Привет, " + message.chat.first_name + @"! Меня зовут DutyBot, я создан, чтобы помогать дежурить. Давай знакомиться!
  ", "{\"keyboard\": [[\"Рассказать DutyBot'у о себе\"], [\"Не хочу знакомиться, ты мне не нравишься\"]],\"resize_keyboard\":true,\"one_time_keyboard\":true}");
+                        DbReader.Insertuser(message.chat.first_name, message.chat.id);
+                        return;
+                    case 0:
 
-
-                    DBReader.insertuser(message.chat.first_name, message.chat.id, 0);
-                    return;
-                }
-
-                if (DBReader.readuserstate(message.chat.id) == 0)
-                {
-
-                    if ((message.text) == "Рассказать DutyBot'у о себе" | (message.text) == "Ввести учётку еще раз")
-                    {
-                        Bot.SendMessage(message.chat.id, @"Чтобы мы могли работать в Jira, мне нужны твои учётные данные. Напиши мне свой логин в формате d.bot и нажми отправить.
+                        if ((message.text) == "Рассказать DutyBot'у о себе" | (message.text) == "Ввести учётку еще раз")
+                        {
+                            _bot.SendMessage(message.chat.id, @"Чтобы мы могли работать в Jira, мне нужны твои учётные данные. Напиши мне свой логин в формате d.bot и нажми отправить.
 Твои данные будут относительно безопасно храниться на сервере");
-                        DBReader.updateuserstate(message.chat.id, 1);
-                        return;
-                    }
-
-                    if ((message.text) == "Не хочу знакомиться, ты мне не нравишься")
-                    {
-                        Bot.SendMessage(message.chat.id, @"Очень жаль, но если надумешь, пиши. Я забуду об этом неприятном разговоре");
-                        DBReader.deletetuser(message.chat.id);
-                        return;
-                    }
-
-                    DBReader.deletetuser(message.chat.id);
-                    return;
-                }
-
-                if (DBReader.readuserstate(message.chat.id) == 1)
-                {
-                    Bot.SendMessage(message.chat.id, @"Теперь напиши пароль");
-                    DBReader.updateuserlogin(message.chat.id, message.text);
-                    DBReader.updateuserstate(message.chat.id, 2);
-                    return;
-                }
-
-                if (DBReader.readuserstate(message.chat.id) == 2)
-                {
-                    DBReader.updateuserpassword(message.chat.id, message.text);
-                    Bot.SendMessage(message.chat.id, @"Отлично, сейчас я проверю, есть ли у тебя доступ в Jira");
-                    if (JiraAddFuncions.CheckConnection(jiraConn, DBReader.readuserlogin(message.chat.id), DBReader.readuserpassword(message.chat.id)))
-                    {
-                        Bot.SendMessage(message.chat.id, @"Всё хорошо, можно начинать работу", "{\"keyboard\": [[\"Начнём\"]],\"resize_keyboard\":true,\"one_time_keyboard\":true}");
-                        DBReader.updateuserstate(message.chat.id, 3);
-                        return;
-                    }
-                    else
-                    {
-                        Bot.SendMessage(message.chat.id, @"Доступа к JIra нет. Возможно учётные данные не верны. Давай попробуем ввести их еще раз. ", "{\"keyboard\": [[\"Ввести учётку еще раз\"]],\"resize_keyboard\":true,\"one_time_keyboard\":true}");
-                        DBReader.updateuserstate(message.chat.id, 0);
-                        return;
-                    }
-
-                }
-
-
-
-                if (DBReader.readuserstate(message.chat.id) == 3)
-                {
-
-                    if ((message.text) == "Начнём")
-                    {
-                        Bot.SendMessage(message.chat.id, "Просто напиши мне сообщение, когда я тебе понадоблюсь. В ответ я пришлю меню с вариантами моих действий. Вот такое ↓", "{\"keyboard\": [[\"Кто сейчас дежурит?\"], [\"Проверь тикеты\"], [\"Помоги с дежурством\"], [\"Пока ничем\"]],\"resize_keyboard\":true,\"one_time_keyboard\":true}");
-                        return;
-                    }
-
-
-                    if ((message.text) == "Кто сейчас дежурит?")
-                    {
-                        Bot.SendMessage(message.chat.id, DBReader.readrespersone(), "{\"keyboard\": [[\"Проверь тикеты\"], [\"Кто сейчас дежурит?\"], [\"Помоги с дежурством\"], [\"Пока ничего\"]],\"resize_keyboard\":true,\"one_time_keyboard\":true}");
-                        return;  
-                    }
-
-                    if ((message.text) == "Проверь тикеты")
-                    {
-                        jiraConn = Jira.CreateRestClient(DBReader.readjira(), DBReader.readuserlogin(message.chat.id), DBReader.readuserpassword(message.chat.id));
-
-                        try
-                        {
-                            var issues = jiraConn.GetIssuesFromJql(DBReader.readfilter());
-
-                            if (issues.Count() > 0)
-                            {
-                                issue = issues.First();
-                                DBReader.updateticket(message.chat.id, issue.Key.ToString());
-                                Bot.SendMessage(message.chat.id, issue);
-                                DBReader.updateuserstate(message.chat.id, 4);
-                            }
-
-                            else
-                            {
-                                Bot.SendMessage(message.chat.id, "Тикетов нет", "{\"keyboard\": [[\"Проверь тикеты\"], [\"Кто сейчас дежурит?\"], [\"Помоги с дежурством\"], [\"Пока ничего\"]],\"resize_keyboard\":true,\"one_time_keyboard\":true}");
-                            }
-
+                            DbReader.Updateuserstate(message.chat.id, 1);
+                            return;
                         }
-                        catch (Exception ex)
+
+                        if ((message.text) == "Не хочу знакомиться, ты мне не нравишься")
                         {
-                            Bot.SendMessage(message.chat.id, "Jira не доступна", "{\"keyboard\": [[\"Проверь тикеты\"], [\"Кто сейчас дежурит?\"], [\"Помоги с дежурством\"], [\"Пока ничего\"]],\"resize_keyboard\":true,\"one_time_keyboard\":true}");
-                            Logger.LogException("error", 1, "SendThatJiraDoesNotWork", ex.Message, "");
+                            _bot.SendMessage(message.chat.id, @"Очень жаль, но если надумешь, пиши. Я забуду об этом неприятном разговоре");
+                            DbReader.Deletetuser(message.chat.id);
+                            return;
                         }
-                        
+
+                        DbReader.Deletetuser(message.chat.id);
                         return;
-                    }
-
-                    if ((message.text) == "Помоги с дежурством")
-                    {
-                        Bot.SendMessage(message.chat.id, "Как будем дежурить?", "{\"keyboard\": [[\"Начать мониторить тикеты\"], [\"Мониторить тикеты в моё дежурство\"], [\"Отмена\"]],\"resize_keyboard\":true,\"one_time_keyboard\":true}");
+                    case 1:
+                        _bot.SendMessage(message.chat.id, @"Теперь напиши пароль");
+                        DbReader.Updateuserlogin(message.chat.id, message.text);
+                        DbReader.Updateuserstate(message.chat.id, 2);
                         return;
-                    }
-
-                    if ((message.text) == "Пока ничего")
-                    {
-                        Bot.SendMessage(message.chat.id, "Ок, если что, пиши.");
-                        return;
-                    }
-
-                    if ((message.text) == "Начать мониторить тикеты")
-                    {
-                        Bot.SendMessage(message.chat.id, @"Начинаю мониторинг.
-Я буду мониторить тикеты в течение ближайших 12 часов, после чего мониторинг будет автоматически остановлен.");
-
-
-                        DBReader.updateuserstate(message.chat.id, 5);
-                        DBReader.updatedutystart(message.chat.id, DateTime.Now);
-                        DBReader.updatedutyend(message.chat.id, DateTime.Now.AddHours(12));
-                        return;
-                    }
-
-                    if ((message.text) == "Мониторить тикеты в моё дежурство")
-                    {
-
-                        if (DBReader.readuserdutystart(message.chat.id) == Convert.ToDateTime("01.01.1900 0:00:00 ") | DBReader.readuserdutystart(message.chat.id) == Convert.ToDateTime("01.01.1900 0:00:00 "))
+                    case 2:
+                        DbReader.Updateuserpassword(message.chat.id, message.text);
+                        _bot.SendMessage(message.chat.id, @"Отлично, сейчас я проверю, есть ли у тебя доступ в Jira");
+                        if (JiraAddFuncions.CheckConnection(_jiraConn, DbReader.Readuserlogin(message.chat.id), DbReader.Readuserpassword(message.chat.id)))
                         {
-                            Bot.SendMessage(message.chat.id, "У тебя нет дежурств в ближайшее время", "{\"keyboard\": [[\"Проверь тикеты\"], [\"Кто сейчас дежурит?\"], [\"Помоги с дежурством\"], [\"Пока ничего\"]],\"resize_keyboard\":true,\"one_time_keyboard\":true}");
+                            _bot.SendMessage(message.chat.id, @"Всё хорошо, можно начинать работу", "{\"keyboard\": [[\"Начнём\"]],\"resize_keyboard\":true,\"one_time_keyboard\":true}");
+                            DbReader.Updateuserstate(message.chat.id, 3);
                             return;
                         }
                         else
                         {
-                            Bot.SendMessage(message.chat.id, "Я буду мониторить тикеты с " + DBReader.readuserdutystart(message.chat.id).ToShortDateString() + " " + DBReader.readuserdutystart(message.chat.id).ToShortTimeString() + " по " + DBReader.readuserdutyend(message.chat.id).ToShortDateString() + " " + DBReader.readuserdutyend(message.chat.id).ToShortTimeString());
-
-                            DBReader.updateuserstate(message.chat.id, 5);
-                            DBReader.updatedutystart(message.chat.id, DBReader.readuserdutystart(message.chat.id));
-                            DBReader.updatedutyend(message.chat.id, DBReader.readuserdutyend(message.chat.id));
+                            _bot.SendMessage(message.chat.id, @"Доступа к JIra нет. Возможно учётные данные не верны. Давай попробуем ввести их еще раз. ", "{\"keyboard\": [[\"Ввести учётку еще раз\"]],\"resize_keyboard\":true,\"one_time_keyboard\":true}");
+                            DbReader.Updateuserstate(message.chat.id, 0);
                             return;
                         }
+                    case 3:
+                        switch (message.text)
+                        {
+                            case "Начнём":
+                                _bot.SendMessage(message.chat.id, "Просто напиши мне сообщение, когда я тебе понадоблюсь. В ответ я пришлю меню с вариантами моих действий. Вот такое ↓", "{\"keyboard\": [[\"Кто сейчас дежурит?\"], [\"Проверь тикеты\"], [\"Помоги с дежурством\"], [\"Пока ничем\"]],\"resize_keyboard\":true,\"one_time_keyboard\":true}");
+                                return;
+                            case "Кто сейчас дежурит?":
+                                _bot.SendMessage(message.chat.id, DbReader.Readrespersone(), "{\"keyboard\": [[\"Проверь тикеты\"], [\"Кто сейчас дежурит?\"], [\"Помоги с дежурством\"], [\"Пока ничего\"]],\"resize_keyboard\":true,\"one_time_keyboard\":true}");
+                                return;
+                            case "Проверь тикеты":
+                                _jiraConn = Jira.CreateRestClient(DbReader.Readjira(), DbReader.Readuserlogin(message.chat.id), DbReader.Readuserpassword(message.chat.id));
 
-                    }
+                                try
+                                {
+                                    var issues = _jiraConn.GetIssuesFromJql(DbReader.Readfilter());
+                                    IList<Issue> enumerable = issues as IList<Issue> ?? issues.ToList();
+                                    if (enumerable.Any())
+                                    {
+                                        _issue = enumerable.Last();
+                                        DbReader.Updateticket(message.chat.id, _issue.Key.ToString());
+                                        _bot.SendMessage(message.chat.id, _issue);
+                                        DbReader.Updateuserstate(message.chat.id, 4);
+                                    }
+                                    else
+                                    {
+                                        _bot.SendMessage(message.chat.id, "Тикетов нет", "{\"keyboard\": [[\"Проверь тикеты\"], [\"Кто сейчас дежурит?\"], [\"Помоги с дежурством\"], [\"Пока ничего\"]],\"resize_keyboard\":true,\"one_time_keyboard\":true}");
+                                    }
 
-                    Bot.SendMessage(message.chat.id, "Чем я могу помочь?", "{\"keyboard\": [[\"Проверь тикеты\"], [\"Кто сейчас дежурит?\"], [\"Помоги с дежурством\"], [\"Пока ничего\"]],\"resize_keyboard\":true,\"one_time_keyboard\":true}");
-                    return;
+                                }
+                                catch (Exception ex)
+                                {
+                                    _bot.SendMessage(message.chat.id, "Jira не доступна", "{\"keyboard\": [[\"Проверь тикеты\"], [\"Кто сейчас дежурит?\"], [\"Помоги с дежурством\"], [\"Пока ничего\"]],\"resize_keyboard\":true,\"one_time_keyboard\":true}");
+                                    Logger.LogException("error", 1, "SendThatJiraDoesNotWork", ex.Message, "");
+                                }
+                        
+                                return;
+                            case "Помоги с дежурством":
+                                _bot.SendMessage(message.chat.id, "Как будем дежурить?", "{\"keyboard\": [[\"Начать мониторить тикеты\"], [\"Мониторить тикеты в моё дежурство\"], [\"Отмена\"]],\"resize_keyboard\":true,\"one_time_keyboard\":true}");
+                                return;
+                            case "Пока ничего":
+                                _bot.SendMessage(message.chat.id, "Ок, если что, пиши.");
+                                return;
+                            case "Начать мониторить тикеты":
+                                _bot.SendMessage(message.chat.id, @"Начинаю мониторинг.
+Я буду мониторить тикеты в течение ближайших 12 часов, после чего мониторинг будет автоматически остановлен.");
+
+
+                                DbReader.Updateuserstate(message.chat.id, 5);
+                                DbReader.Updatedutystart(message.chat.id, DateTime.Now);
+                                DbReader.Updatedutyend(message.chat.id, DateTime.Now.AddHours(12));
+                                return;
+                            case "Мониторить тикеты в моё дежурство":
+
+                                if (DbReader.Readuserdutystart(message.chat.id) == Convert.ToDateTime("01.01.1900 0:00:00 ") | DbReader.Readuserdutystart(message.chat.id) == Convert.ToDateTime("01.01.1900 0:00:00 "))
+                                {
+                                    _bot.SendMessage(message.chat.id, "У тебя нет дежурств в ближайшее время", "{\"keyboard\": [[\"Проверь тикеты\"], [\"Кто сейчас дежурит?\"], [\"Помоги с дежурством\"], [\"Пока ничего\"]],\"resize_keyboard\":true,\"one_time_keyboard\":true}");
+                                    return;
+                                }
+                                else
+                                {
+                                    _bot.SendMessage(message.chat.id, "Я буду мониторить тикеты с " + DbReader.Readuserdutystart(message.chat.id).ToShortDateString() + " " + DbReader.Readuserdutystart(message.chat.id).ToShortTimeString() + " по " + DbReader.Readuserdutyend(message.chat.id).ToShortDateString() + " " + DbReader.Readuserdutyend(message.chat.id).ToShortTimeString());
+                                    DbReader.Updateuserstate(message.chat.id, 5);
+                                    DbReader.Updatedutystart(message.chat.id, DbReader.Readuserdutystart(message.chat.id));
+                                    DbReader.Updatedutyend(message.chat.id, DbReader.Readuserdutyend(message.chat.id));
+                                    return;
+                                }
+                        }
+                        _bot.SendMessage(message.chat.id, "Чем я могу помочь?", "{\"keyboard\": [[\"Проверь тикеты\"], [\"Кто сейчас дежурит?\"], [\"Помоги с дежурством\"], [\"Пока ничего\"]],\"resize_keyboard\":true,\"one_time_keyboard\":true}");
+                        return;
+                    case 4:
+
+                        if (_issue.Key.ToString().Equals(DbReader.Readticket(message.chat.id)))
+                        {
+                            switch ((message.text))
+                            {
+                                case "Распределить":
+                                    _bot.SendMessage(message.chat.id, "Кому назначим?", "{\"keyboard\": [[\"Технологи\", \"Коммерция\"], [\"Админы\", \"Связисты\"], [\"Олеся\", \"Женя\"], [\"Алексей\", \"Максим\"], [\"Паша\", \"Марина\"], [\"Андрей\", \"Гриша\"], [\"Оля\", \"Настя\"]],\"resize_keyboard\":true,\"one_time_keyboard\":true}");
+                                    return;
+                                case "Решить":
+                                    JiraAddFuncions.ResolveTicket(_issue, message, DbReader.Readuserlogin(message.chat.id), _bot, _jiraConn);
+                                    return;
+                                case "Назначить себе":
+                                    JiraAddFuncions.AssingTicket(_issue, message, DbReader.Readuserlogin(message.chat.id), _bot, _jiraConn);
+                                    return;
+                                case "Технологи":
+                                    JiraAddFuncions.AssingTicket(_issue, message, "tecnologsupport", _bot, _jiraConn);
+                                    return;
+                                case "Коммерция":
+                                    JiraAddFuncions.AssingTicket(_issue, message, "crm_otdel", _bot, _jiraConn);
+                                    return;
+                                case "Админы":
+                                    JiraAddFuncions.AssingTicket(_issue, message, "Uk.Jira.TechSupport", _bot, _jiraConn);
+                                    return;
+                                case "Связисты":
+                                    JiraAddFuncions.AssingTicket(_issue, message, "uk.jira.noc", _bot, _jiraConn);
+                                    return;
+                                case "Олеся":
+                                    JiraAddFuncions.AssingTicket(_issue, message, "o.likhacheva", _bot, _jiraConn);
+                                    return;
+                                case "Женя":
+                                    JiraAddFuncions.AssingTicket(_issue, message, "ev.safonov", _bot, _jiraConn);
+                                    return;
+                                case "Алексей":
+                                    JiraAddFuncions.AssingTicket(_issue, message, "a.sapotko", _bot, _jiraConn);
+                                    return;
+                                case "Максим":
+                                    JiraAddFuncions.AssingTicket(_issue, message, "m.shemetov", _bot, _jiraConn);
+                                    return;
+                                case "Андрей":
+                                    JiraAddFuncions.AssingTicket(_issue, message, "an.zarubin", _bot, _jiraConn);
+                                    return;
+                                case "Гриша":
+                                    JiraAddFuncions.AssingTicket(_issue, message, "g.dementiev", _bot, _jiraConn);
+                                    return;
+                                case "Оля":
+                                    JiraAddFuncions.AssingTicket(_issue, message, "o.tkachenko", _bot, _jiraConn);
+                                    return;
+                                case "Настя":
+                                    JiraAddFuncions.AssingTicket(_issue, message, "a.zakharova", _bot, _jiraConn);
+                                    return;
+                                case "Марина":
+                                    JiraAddFuncions.AssingTicket(_issue, message, "m.vinnikova", _bot, _jiraConn);
+                                    return;
+                                case "Паша":
+                                    JiraAddFuncions.AssingTicket(_issue, message, "p.denisov", _bot, _jiraConn);
+                                    break;
+                            }
+                        }
+                        else
+                        {
+                            _bot.SendMessage(message.chat.id, "Похоже, тикет уже распределён.");
+                            DbReader.Updateuserstate(message.chat.id, 3);
+                        }
+                        break;
                 }
 
-                if (DBReader.readuserstate(message.chat.id) == 4)
-                {
 
-                    if (issue.Key.ToString().Equals(DBReader.readticket(message.chat.id)))
-                    {
-
-                        if ((message.text) == "Распределить")
-                        {
-                            Bot.SendMessage(message.chat.id, "Кому назначим?", "{\"keyboard\": [[\"Технологи\", \"Коммерция\"], [\"Админы\", \"Связисты\"], [\"Олеся\", \"Женя\"], [\"Алексей\", \"Максим\"], [\"Паша\", \"Марина\"], [\"Андрей\", \"Гриша\"], [\"Оля\", \"Настя\"]],\"resize_keyboard\":true,\"one_time_keyboard\":true}");
-                            return;
-                        }
-
-                        if ((message.text) == "Решить")
-                        {
-
-                            JiraAddFuncions.ResolveTicket(issue, message, DBReader.readuserlogin(message.chat.id), Bot, jiraConn);
-                            return;
-                        }
-
-                        if ((message.text) == "Назначить себе")
-                        {
-                            JiraAddFuncions.AssingTicket(issue, message, DBReader.readuserlogin(message.chat.id), Bot, jiraConn);
-                        }
-
-                        if ((message.text) == "Технологи") JiraAddFuncions.AssingTicket(issue, message, "tecnologsupport", Bot, jiraConn);
-                        if ((message.text) == "Коммерция") JiraAddFuncions.AssingTicket(issue, message, "crm_otdel", Bot, jiraConn);
-                        if ((message.text) == "Админы") JiraAddFuncions.AssingTicket(issue, message, "Uk.Jira.TechSupport", Bot, jiraConn);
-                        if ((message.text) == "Связисты") JiraAddFuncions.AssingTicket(issue, message, "uk.jira.noc", Bot, jiraConn);
-                        if ((message.text) == "Олеся") JiraAddFuncions.AssingTicket(issue, message, "o.likhacheva", Bot, jiraConn);
-                        if ((message.text) == "Женя") JiraAddFuncions.AssingTicket(issue, message, "ev.safonov", Bot, jiraConn);
-                        if ((message.text) == "Алексей") JiraAddFuncions.AssingTicket(issue, message, "a.sapotko", Bot, jiraConn);
-                        if ((message.text) == "Максим") JiraAddFuncions.AssingTicket(issue, message, "m.shemetov", Bot, jiraConn);
-                        if ((message.text) == "Андрей") JiraAddFuncions.AssingTicket(issue, message, "an.zarubin", Bot, jiraConn);
-                        if ((message.text) == "Гриша") JiraAddFuncions.AssingTicket(issue, message, "g.dementiev", Bot, jiraConn);
-                        if ((message.text) == "Оля") JiraAddFuncions.AssingTicket(issue, message, "o.tkachenko", Bot, jiraConn);
-                        if ((message.text) == "Настя") JiraAddFuncions.AssingTicket(issue, message, "a.zakharova", Bot, jiraConn);
-                        if ((message.text) == "Марина") JiraAddFuncions.AssingTicket(issue, message, "m.vinnikova", Bot, jiraConn);
-                        if ((message.text) == "Паша") JiraAddFuncions.AssingTicket(issue, message, "p.denisov", Bot, jiraConn);
-
-                    }
-                    else
-                    {
-                        Bot.SendMessage(message.chat.id, "Похоже, тикет уже распределён.");
-                        DBReader.updateuserstate(message.chat.id, 3);
-                    }
-                }
-
-
-                if (DBReader.readuserstate(message.chat.id) == 5)
+                if (DbReader.Readuserstate(message.chat.id) == 5)
                 {
                     switch (message.text)
                     {
                         case ("Остановить мониторинг"):
                             {
-                                DBReader.updateuserstate(message.chat.id, 3);
-                                Bot.SendMessage(message.chat.id, "Готово");
+                                DbReader.Updateuserstate(message.chat.id, 3);
+                                _bot.SendMessage(message.chat.id, "Готово");
 
                                 break;
                             }
 
-                        default: Bot.SendMessage(message.chat.id, "да?", "{\"keyboard\": [[\"Остановить мониторинг\"]],\"resize_keyboard\":true,\"one_time_keyboard\":true}"); break;
+                        default: _bot.SendMessage(message.chat.id, "да?", "{\"keyboard\": [[\"Остановить мониторинг\"]],\"resize_keyboard\":true,\"one_time_keyboard\":true}"); break;
                     }
                 }
 
-                if (DBReader.readuserstate(message.chat.id) == 6)
+                if (DbReader.Readuserstate(message.chat.id) == 6)
                 {
-                    if (ticket.Key.ToString().Equals(DBReader.readticket(message.chat.id)))
+                    if (_ticket.Key.ToString().Equals(DbReader.Readticket(message.chat.id)))
                     {
 
                         switch (message.text)
                         {
                             case ("Распределить"):
                                  {
-                                    Bot.SendMessage(message.chat.id, "Кому назначим?", "{\"keyboard\": [[\"Технологи\", \"Коммерция\"], [\"Админы\", \"Связисты\"], [\"Олеся\", \"Женя\"], [\"Алексей\", \"Максим\"], [\"Паша\", \"Марина\"], [\"Андрей\", \"Гриша\"], [\"Оля\", \"Настя\"]],\"resize_keyboard\":true,\"one_time_keyboard\":true}");
+                                    _bot.SendMessage(message.chat.id, "Кому назначим?", "{\"keyboard\": [[\"Технологи\", \"Коммерция\"], [\"Админы\", \"Связисты\"], [\"Олеся\", \"Женя\"], [\"Алексей\", \"Максим\"], [\"Паша\", \"Марина\"], [\"Андрей\", \"Гриша\"], [\"Оля\", \"Настя\"]],\"resize_keyboard\":true,\"one_time_keyboard\":true}");
                                     break;
                                 }
 
                             case ("Решить"):
                                 {
-                                    JiraAddFuncions.ResolveTicket6(ticket, message, DBReader.readuserlogin(message.chat.id), Bot, jiraConn);
+                                    JiraAddFuncions.ResolveTicket6(_ticket, message, DbReader.Readuserlogin(message.chat.id), _bot, _jiraConn);
                                     break;
                                 }
 
                             case ("Назначить себе"):
                                 {
-                                    JiraAddFuncions.AssingTicket6(ticket, message, DBReader.readuserlogin(message.chat.id), Bot, jiraConn);
+                                    JiraAddFuncions.AssingTicket6(_ticket, message, DbReader.Readuserlogin(message.chat.id), _bot, _jiraConn);
                                     break;
                                 }
 
                             case ("Остановить мониторинг"):
                                 {
-
-                                    Bot.SendMessage(message.chat.id, "Готово");
-                                    DBReader.updateuserstate(message.chat.id, 3);
+                                    _bot.SendMessage(message.chat.id, "Готово");
+                                    DbReader.Updateuserstate(message.chat.id, 3);
                                     break;
                                 }
 
-                            case ("Технологи"): JiraAddFuncions.AssingTicket6(ticket, message, "tecnologsupport", Bot, jiraConn); break;
-                            case ("Коммерция"): JiraAddFuncions.AssingTicket6(ticket, message, "crm_otdel", Bot, jiraConn); break;
-                            case ("Админы"): JiraAddFuncions.AssingTicket6(ticket, message, "Uk.Jira.TechSupport", Bot, jiraConn); break;
-                            case ("Связисты"): JiraAddFuncions.AssingTicket6(ticket, message, "uk.jira.noc", Bot, jiraConn); break;
-                            case ("Олеся"): JiraAddFuncions.AssingTicket6(ticket, message, "o.likhacheva", Bot, jiraConn); break;
-                            case ("Женя"): JiraAddFuncions.AssingTicket6(ticket, message, "ev.safonov", Bot, jiraConn); break;
-                            case ("Алексей"): JiraAddFuncions.AssingTicket6(ticket, message, "a.sapotko", Bot, jiraConn); break;
-                            case ("Максим"): JiraAddFuncions.AssingTicket6(ticket, message, "m.shemetov", Bot, jiraConn); break;
-                            case ("Паша"): JiraAddFuncions.AssingTicket6(ticket, message, "p.denisov", Bot, jiraConn); break;
-                            case ("Марина"): JiraAddFuncions.AssingTicket6(ticket, message, "m.vinnikova", Bot, jiraConn); break;
-                            case ("Андрей"): JiraAddFuncions.AssingTicket6(ticket, message, "an.zarubin", Bot, jiraConn); break;
-                            case ("Гриша"): JiraAddFuncions.AssingTicket6(ticket, message, "g.dementiev", Bot, jiraConn); break;
-                            case ("Оля"): JiraAddFuncions.AssingTicket6(ticket, message, "o.tkachenko", Bot, jiraConn); break;
-                            case ("Настя"): JiraAddFuncions.AssingTicket6(ticket, message, "a.zakharova", Bot, jiraConn); break;
+                            case ("Технологи"): JiraAddFuncions.AssingTicket6(_ticket, message, "tecnologsupport", _bot, _jiraConn); break;
+                            case ("Коммерция"): JiraAddFuncions.AssingTicket6(_ticket, message, "crm_otdel", _bot, _jiraConn); break;
+                            case ("Админы"): JiraAddFuncions.AssingTicket6(_ticket, message, "Uk.Jira.TechSupport", _bot, _jiraConn); break;
+                            case ("Связисты"): JiraAddFuncions.AssingTicket6(_ticket, message, "uk.jira.noc", _bot, _jiraConn); break;
+                            case ("Олеся"): JiraAddFuncions.AssingTicket6(_ticket, message, "o.likhacheva", _bot, _jiraConn); break;
+                            case ("Женя"): JiraAddFuncions.AssingTicket6(_ticket, message, "ev.safonov", _bot, _jiraConn); break;
+                            case ("Алексей"): JiraAddFuncions.AssingTicket6(_ticket, message, "a.sapotko", _bot, _jiraConn); break;
+                            case ("Максим"): JiraAddFuncions.AssingTicket6(_ticket, message, "m.shemetov", _bot, _jiraConn); break;
+                            case ("Паша"): JiraAddFuncions.AssingTicket6(_ticket, message, "p.denisov", _bot, _jiraConn); break;
+                            case ("Марина"): JiraAddFuncions.AssingTicket6(_ticket, message, "m.vinnikova", _bot, _jiraConn); break;
+                            case ("Андрей"): JiraAddFuncions.AssingTicket6(_ticket, message, "an.zarubin", _bot, _jiraConn); break;
+                            case ("Гриша"): JiraAddFuncions.AssingTicket6(_ticket, message, "g.dementiev", _bot, _jiraConn); break;
+                            case ("Оля"): JiraAddFuncions.AssingTicket6(_ticket, message, "o.tkachenko", _bot, _jiraConn); break;
+                            case ("Настя"): JiraAddFuncions.AssingTicket6(_ticket, message, "a.zakharova", _bot, _jiraConn); break;
 
-                            default: Bot.SendMessage(message.chat.id, "да?", "{\"keyboard\": [[\"Остановить мониторинг\"]],\"resize_keyboard\":true,\"one_time_keyboard\":true}"); break;
+                            default: _bot.SendMessage(message.chat.id, "да?", "{\"keyboard\": [[\"Остановить мониторинг\"]],\"resize_keyboard\":true,\"one_time_keyboard\":true}"); break;
                         }
                     }
                     else
                     {
-                        Bot.SendMessage(message.chat.id, "Похоже, тикет уже распределён.");
-                        DBReader.updateuserstate(message.chat.id, 5);
+                        _bot.SendMessage(message.chat.id, "Похоже, тикет уже распределён.");
+                        DbReader.Updateuserstate(message.chat.id, 5);
                     }
                 }
 
             }
             catch (Exception ex)
             {
-                DBReader.updateuserstate(message.chat.id, 3);
-                Bot.SendMessage(message.chat.id, "Что-то пошло не так при обработке сообщения.", "{\"keyboard\": [[\"Проверь тикеты\"], [\"Кто сейчас дежурит?\"], [\"Помоги с дежурством\"], [\"Пока ничего\"]],\"resize_keyboard\":true,\"one_time_keyboard\":true}");
+                DbReader.Updateuserstate(message.chat.id, 3);
+                _bot.SendMessage(message.chat.id, "Что-то пошло не так при обработке сообщения.", "{\"keyboard\": [[\"Проверь тикеты\"], [\"Кто сейчас дежурит?\"], [\"Помоги с дежурством\"], [\"Пока ничего\"]],\"resize_keyboard\":true,\"one_time_keyboard\":true}");
 
                 Logger.LogException("error", message.chat.id, "ProcessMessage", ex.Message, "");
                 Thread.Sleep(5000);
