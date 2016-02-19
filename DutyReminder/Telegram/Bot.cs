@@ -21,7 +21,7 @@ namespace Telegram
 
         public void SendMessage(int chatid, string message, string replyMarkup)
         {
-            Sender.Send("https://api.telegram.org/bot" + _botkey + "/sendmessage?chat_id=" + chatid + "&text=" + message + "&replyMarkup=" + replyMarkup);
+            Sender.Send("https://api.telegram.org/bot" + _botkey + "/sendmessage?chat_id=" + chatid + "&text=" + message + "&reply_markup=" + replyMarkup);
         }
 
         public void SendMessage(int chatid, string message)

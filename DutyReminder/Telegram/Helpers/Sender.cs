@@ -11,7 +11,7 @@ namespace Telegram
 {
     static class Sender
     {
-        static public string Send(string url, string message = "", string ContentType = "application/x-www-form-urlencoded")
+        static public string Send(string url, string message = "", string contentType = "application/x-www-form-urlencoded")
         {
             url = UrlClearer.Clear(url);
 
@@ -23,8 +23,8 @@ namespace Telegram
             //string postData = "{\"value1\":\"" + message + "\"}";
             string postData = message;
             byte[] byteArray = Encoding.UTF8.GetBytes(postData);
-            // Set the ContentType property of the WebRequest.
-            request.ContentType = ContentType;
+            // Set the contentType property of the WebRequest.
+            request.ContentType = contentType;
             // Set the ContentLength property of the WebRequest.
             //  request.ContentLength = byteArray.Length;
             // Get the request stream.
