@@ -29,7 +29,7 @@ namespace Telegram
             //  request.ContentLength = byteArray.Length;
             // Get the request stream.
             Stream dataStream = request.GetRequestStream();
-            // Write the data to the request stream.
+            // Write the data to the request stream. 
             dataStream.Write(byteArray, 0, byteArray.Length);
             // Close the Stream object.
             dataStream.Close();
