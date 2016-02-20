@@ -100,15 +100,14 @@ namespace DutyBot
         private bool _readmessagesflag = true; //пока true, работает потог чтения сообщений
         private bool _checkjiraflag = true; //пока true, работает потог проверки jira
 
-        public void Checkjira()
+        public void Checkjira() // метод запускается в потоке _checkTicketsThread и вычитывает тикеты из фильтра в jira
         {
             _jiraConn = Jira.CreateRestClient(DbReader.Readjira(), DbReader.Readdefaultuser(), DbReader.Readdefaultpassword());
             while (_checkjiraflag)
             {
                 try
                 {
-                var u = DbReader.Readallpeople();
-                // если дежурство закончилось, меняем статус на 3
+                var u = DbReader.Readallpeople();  //вычитываем все пользователей и если дежурство закончилось, меняем статус на 3
               
                     for (int i = 0; i < u.GetLength(0); i++)
                     {
@@ -215,7 +214,10 @@ namespace DutyBot
             {
                 Issue issue = null; //тикет в jira, используется в потоке при проверке тикетов вручную
 
-                switch (DbReader.Readuserstate(message.chat.id))
+                switch (DbReader.Readuserstate(message.chat.id)) //смотрю, в каком статусе пользователь 
+                                                                 //- 1 его нет, 0 ззнакомство с DUtyBot, 1 Ввод пароля, 2, проверка доступа в jira, 
+                                                                 //3 основной статус, ожидаем команды, 4 пользователь решает что делать с тикетом, который получил от бота по кнопке Проверь тикеты
+                                                                 //5 идёт мониторинг тикетов, пользователь получает уведомления, 6 пользователь решает что делать с тикетом, который получил при мониторинге
                 {
                     case -1:
                         _bot.SendMessage(message.chat.id, "Привет, " + message.chat.first_name + @"! Меня зовут DutyBot, я создан, чтобы помогать дежурить. Давай знакомиться!
