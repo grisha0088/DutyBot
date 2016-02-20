@@ -5,7 +5,7 @@ using Telegram;
 
 namespace DutyBot
 {
-    class Logger
+    internal class Logger
     {
         #if DEBUG
         static string dutyBotDB = "Data Source=uk-duty01\\duty01;Initial Catalog=DutyBot_debug; Integrated Security=false; User ID=DutyBot; Password=123qwe!;";
