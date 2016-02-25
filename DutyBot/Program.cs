@@ -255,6 +255,7 @@ namespace DutyBot
                             "{\"keyboard\": [[\"Рассказать DutyBot'у о себе\"], [\"Не хочу знакомиться, ты мне не нравишься\"]],\"resize_keyboard\":true,\"one_time_keyboard\":true}");
                         using (var db = new DutyBotDbContext())
                         {
+                            user = db.Users.Find(user.Id);
                             user.State = 0;
                             db.SaveChanges();
                         }
@@ -268,12 +269,11 @@ namespace DutyBot
 
                             using (var db = new DutyBotDbContext())
                             {
-                                user = new User
-                                {
-                                    Name = message.chat.first_name,
-                                    TlgNumber = message.chat.id,
-                                    State = 1
-                                };
+
+                                user = db.Users.Find(user.Id);
+                                user.Name = message.chat.first_name;
+                                user.TlgNumber = message.chat.id;
+                                user.State = 1;
 
                                 db.SaveChanges();
                             }
@@ -287,7 +287,9 @@ namespace DutyBot
                                 @"Очень жаль, но если надумешь, пиши. Я забуду об этом неприятном разговоре");
                             using (var db = new DutyBotDbContext())
                             {
+                                user = db.Users.Find(user.Id);
                                 db.Users.Remove(user);
+                                db.SaveChanges();
                             }
                             return;
                         }
@@ -297,6 +299,7 @@ namespace DutyBot
                         _bot.SendMessage(message.chat.id, @"Теперь напиши пароль");
                         using (var db = new DutyBotDbContext())
                         {
+                            user = db.Users.Find(user.Id);
                             user.Login = message.text;
                             user.State = 2;
                             db.SaveChanges();
@@ -315,6 +318,8 @@ namespace DutyBot
                                 "{\"keyboard\": [[\"Начнём\"]],\"resize_keyboard\":true,\"one_time_keyboard\":true}");
                             using (var db = new DutyBotDbContext())
                             {
+                                user = db.Users.Find(user.Id);
+                                user.Password = message.text;
                                 user.State = 3;
                                 db.SaveChanges();
                             }
@@ -327,6 +332,7 @@ namespace DutyBot
                                 "{\"keyboard\": [[\"Ввести учётку еще раз\"]],\"resize_keyboard\":true,\"one_time_keyboard\":true}");
                             using (var db = new DutyBotDbContext())
                             {
+                                user = db.Users.Find(user.Id);
                                 user.State = 0;
                                 db.SaveChanges();
                             }
@@ -350,13 +356,14 @@ namespace DutyBot
 
                                 try
                                 {
-                                    var issues = _jiraConn.GetIssuesFromJql(DbReader.Readfilter());
+                                    var issues = _jiraConn.GetIssuesFromJql("project = SUPPORT AND key = SUPPORT-128046");
                                     IList<Issue> enumerable = issues as IList<Issue> ?? issues.ToList();
                                     if (enumerable.Any())
                                     {
                                         issue = enumerable.Last();
                                         using (var db = new DutyBotDbContext())
                                         {
+                                            user = db.Users.Find(user.Id);
                                             user.TicketNumber = issue.Key.ToString();
                                             user.State = 4;
                                             db.SaveChanges();
@@ -391,6 +398,7 @@ namespace DutyBot
 
                                 using (var db = new DutyBotDbContext())
                                 {
+                                    user = db.Users.Find(user.Id);
                                     user.State = 5;
                                     user.DutyStart = DateTime.Now;
                                     user.DutyEnd = DateTime.Now.AddHours(12);
@@ -419,6 +427,7 @@ namespace DutyBot
 
                                     using (var db = new DutyBotDbContext())
                                     {
+                                        user = db.Users.Find(user.Id);
                                         user.State = 5;
                                         user.DutyStart = DbReader.Readuserdutystart(message.chat.id);
                                         user.DutyEnd = DbReader.Readuserdutyend(message.chat.id);
@@ -495,6 +504,7 @@ namespace DutyBot
                             _bot.SendMessage(message.chat.id, "Похоже, тикет уже распределён.");
                             using (var db = new DutyBotDbContext())
                             {
+                                user = db.Users.Find(user.Id);
                                 user.State = 3;
                                 db.SaveChanges();
                             }
@@ -561,6 +571,7 @@ namespace DutyBot
                             {
                                     using (var db = new DutyBotDbContext())
                                     {
+                                        user = db.Users.Find(user.Id);
                                         user.State = 3;
                                         db.SaveChanges();
                                     }
@@ -585,6 +596,7 @@ namespace DutyBot
                                     _bot.SendMessage(message.chat.id, "Готово");
                                         using (var db = new DutyBotDbContext())
                                         {
+                                            user = db.Users.Find(user.Id);
                                             user.State = 3;
                                             db.SaveChanges();
                                         }
@@ -601,6 +613,7 @@ namespace DutyBot
                             _bot.SendMessage(message.chat.id, "Похоже, тикет уже распределён.");
                             using (var db = new DutyBotDbContext())
                             {
+                                user = db.Users.Find(user.Id);
                                 user.State = 5;
                                 db.SaveChanges();
                             }
@@ -612,6 +625,7 @@ namespace DutyBot
             {
                 using (var db = new DutyBotDbContext())
                 {
+                    user = db.Users.Find(user.Id);
                     user.State = 3;
                     db.SaveChanges();
                 }

@@ -25,6 +25,7 @@ namespace DutyBot
 
                     using (var db = new DutyBotDbContext())
                     {
+                        user = db.Users.Find(user.Id);
                         user.State = state;
                         user.TicketNumber = "";
                         db.SaveChanges();
@@ -36,6 +37,7 @@ namespace DutyBot
                 {
                     using (var db = new DutyBotDbContext())
                     {
+                        user = db.Users.Find(user.Id);
                         user.State = state;
                         user.TicketNumber = "";
                         db.SaveChanges();
@@ -50,6 +52,7 @@ namespace DutyBot
                 Logger.LogException("error", message.chat.id, "AssingTicket", ex.GetType() + ": " + ex.Message, issue.Key.Value);
                 using (var db = new DutyBotDbContext())
                 {
+                    user = db.Users.Find(user.Id);
                     user.State = state;
                     db.SaveChanges();
                 }
@@ -76,6 +79,7 @@ namespace DutyBot
 
                     using (var db = new DutyBotDbContext())
                     {
+                        user = db.Users.Find(user.Id);
                         user.State = state;
                         user.TicketNumber = "";
                         db.SaveChanges();
@@ -87,6 +91,7 @@ namespace DutyBot
                 {
                     using (var db = new DutyBotDbContext())
                     {
+                        user = db.Users.Find(user.Id);
                         user.State = state;
                         user.TicketNumber = "";
                         db.SaveChanges();
@@ -100,6 +105,7 @@ namespace DutyBot
                 Logger.LogException("error", message.chat.id, "ResolveTicket", ex.GetType() + ": " + ex.Message, issue.Key.Value);
                 using (var db = new DutyBotDbContext())
                 {
+                    user = db.Users.Find(user.Id);
                     user.State = state;
                     db.SaveChanges();
                 }
