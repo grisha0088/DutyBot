@@ -79,6 +79,10 @@
     <Compile Include="Migrations\201602230726506_Changetipe.Designer.cs">
       <DependentUpon>201602230726506_Changetipe.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201602250559047_AddTelegrumNumber.cs" />
+    <Compile Include="Migrations\201602250559047_AddTelegrumNumber.Designer.cs">
+      <DependentUpon>201602250559047_AddTelegrumNumber.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Telegram\Classes.cs" />
     <Compile Include="Telegram\Bot.cs" />
@@ -100,6 +104,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201602230726506_Changetipe.resx">
       <DependentUpon>201602230726506_Changetipe.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201602250559047_AddTelegrumNumber.resx">
+      <DependentUpon>201602250559047_AddTelegrumNumber.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
