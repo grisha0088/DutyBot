@@ -71,6 +71,7 @@
   <ItemGroup>
     <Compile Include="DutyBotDbContext.cs" />
     <Compile Include="JiraAddFuncions.cs" />
+    <Compile Include="Log.cs" />
     <Compile Include="Migrations\201602230701061_AddUsers.cs" />
     <Compile Include="Migrations\201602230701061_AddUsers.Designer.cs">
       <DependentUpon>201602230701061_AddUsers.cs</DependentUpon>
@@ -83,7 +84,12 @@
     <Compile Include="Migrations\201602250559047_AddTelegrumNumber.Designer.cs">
       <DependentUpon>201602250559047_AddTelegrumNumber.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201602251117362_LogsAndParametrs.cs" />
+    <Compile Include="Migrations\201602251117362_LogsAndParametrs.Designer.cs">
+      <DependentUpon>201602251117362_LogsAndParametrs.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
+    <Compile Include="Parametr.cs" />
     <Compile Include="Telegram\Classes.cs" />
     <Compile Include="Telegram\Bot.cs" />
     <Compile Include="Program.cs" />
@@ -107,6 +113,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201602250559047_AddTelegrumNumber.resx">
       <DependentUpon>201602250559047_AddTelegrumNumber.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201602251117362_LogsAndParametrs.resx">
+      <DependentUpon>201602251117362_LogsAndParametrs.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
