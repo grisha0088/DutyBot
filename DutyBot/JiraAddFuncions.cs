@@ -9,7 +9,6 @@ namespace DutyBot
     {
         public static void AssingTicket(User user, Issue issue, Message message, string assignee, TelegramBot bot, Jira jiraConn, string keyboard = "{\"keyboard\": [[\"Проверь тикеты\"], [\"Кто сейчас дежурит?\"], [\"Помоги с дежурством\"], [\"Пока ничего\"]],\"resize_keyboard\":true,\"one_time_keyboard\":true}")
         {
-            int state = user.State - 1; //безумный костыль для того, чтобы вычислять статус, который нужно перевсети пользоваетля. Так получилось, что это 3 для 4 статуса, и 5 для 6 статуса. 
             try
             {
                 issue.Refresh();
@@ -23,39 +22,22 @@ namespace DutyBot
                     issue.Assignee = assignee;
                     issue.SaveChanges();
 
-                    using (var db = new DutyBotDbContext())
-                    {
-                        user = db.Users.Find(user.Id);
-                        user.State = state;
-                        user.TicketNumber = "";
-                        db.SaveChanges();
-                    }
-
+                    user.State -= 1; //безумный костыль для того, чтобы вычислять статус, который нужно перевсети пользоваетля. Так получилось, что это 3 для 4 статуса, и 5 для 6 статуса. 
+                    user.TicketNumber = "";
                     bot.SendMessage(message.chat.id, "Готово.", keyboard);
                 }
                 else
                 {
-                    using (var db = new DutyBotDbContext())
-                    {
-                        user = db.Users.Find(user.Id);
-                        user.State = state;
-                        user.TicketNumber = "";
-                        db.SaveChanges();
-                    }
-
+                    user.State -= 1;
+                    user.TicketNumber = "";
                     bot.SendMessage(message.chat.id, "Тикет уже распределён", keyboard);
                 }
-
             }
             catch (Exception ex)
             {
                 Logger.LogException("error", message.chat.id, "AssingTicket", ex.GetType() + ": " + ex.Message, issue.Key.Value);
-                using (var db = new DutyBotDbContext())
-                {
-                    user = db.Users.Find(user.Id);
-                    user.State = state;
-                    db.SaveChanges();
-                }
+                user.State -= 1;
+                user.TicketNumber = "";
                 bot.SendMessage(message.chat.id, "Что-то пошло не так.", "{\"keyboard\": [[\"Проверь тикеты\"], [\"Кто сейчас дежурит?\"], [\"Помоги с дежурством\"], [\"Пока ничего\"]],\"resize_keyboard\":true,\"one_time_keyboard\":true}");
 
             }

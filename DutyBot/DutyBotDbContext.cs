@@ -6,7 +6,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace DutyBot
 {
-    class DutyBotDbContext : DbContext
+    public class DutyBotDbContext : DbContext
     {
         public DutyBotDbContext(): base("DbConnection"){ }
 

@@ -90,6 +90,7 @@
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Parametr.cs" />
+    <Compile Include="Repository.cs" />
     <Compile Include="Telegram\Classes.cs" />
     <Compile Include="Telegram\Bot.cs" />
     <Compile Include="Program.cs" />
