@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Telegram;
 using System.Threading;
 using Atlassian.Jira;
+using Telegram;
 using Topshelf;
 
 namespace DutyBot
@@ -57,7 +57,7 @@ namespace DutyBot
                             Exception = "",
                             AddInfo = ""
                         };
-                        repository.Create<Log>(logReccord);
+                        repository.Create(logReccord);
 
                     }
                 }
@@ -77,7 +77,7 @@ namespace DutyBot
                                 Exception = ex.GetType() + ": " + ex.Message,
                                 AddInfo = ""
                             };
-                            repository.Create<Log>(exReccord);
+                            repository.Create(exReccord);
 
                             var logReccord = new Log
                             {
@@ -88,7 +88,7 @@ namespace DutyBot
                                 Exception = "",
                                 AddInfo = ""
                             };
-                            repository.Create<Log>(logReccord);
+                            repository.Create(logReccord);
                         }
                     }
                     catch
@@ -127,7 +127,7 @@ namespace DutyBot
                         Exception = ex.GetType() + ": " + ex.Message,
                         AddInfo = ""
                     };
-                    repository.Create<Log>(logReccord);
+                    repository.Create(logReccord);
                 }
             }
         }
@@ -147,7 +147,7 @@ namespace DutyBot
                         Exception = "",
                         AddInfo = ""
                     };
-                    repository.Create<Log>(logReccord);
+                    repository.Create(logReccord);
                 }
                 _readmessagesflag = false; 
                 _checkjiraflag = false;
@@ -165,7 +165,7 @@ namespace DutyBot
                         Exception = ex.GetType() + ": " + ex.Message,
                         AddInfo = ""
                     };
-                    repository.Create<Log>(logReccord);
+                    repository.Create(logReccord);
                 }
             }
         }
@@ -187,10 +187,6 @@ namespace DutyBot
 
         public void Checkjira() // метод запускается в потоке _checkTicketsThread и вычитывает тикеты из фильтра в jira
         {
-            using (var repository = new Repository<DutyBotDbContext>())
-            {
-
-            }
             _jiraConn = Jira.CreateRestClient(_jiraParam.Value, _userLoginParam.Value, _userPasswordParam.Value);
             while (_checkjiraflag)
             {
@@ -202,7 +198,7 @@ namespace DutyBot
                         foreach(var user in users)
                         {
                             user.State = 3;
-                            repository.Update<User>(user);
+                            repository.Update(user);
                         }
                     }
                 }
@@ -219,7 +215,7 @@ namespace DutyBot
                             Exception = ex.GetType() + ": " + ex.Message,
                             AddInfo = ""
                         };
-                        repository.Create<Log>(logReccord);
+                        repository.Create(logReccord);
                     }
                 }
 
@@ -241,7 +237,7 @@ namespace DutyBot
                                 _jiraConn = Jira.CreateRestClient(_jiraParam.Value, user.Login, user.Password);
                                 user.TicketNumber = _issue.Key.ToString();
                                 _bot.SendMessage(user.TlgNumber, _issue);
-                                repository.Update<User>(user);
+                                repository.Update(user);
                             }
                         }
                         else
@@ -266,7 +262,7 @@ namespace DutyBot
                                     "Похоже, что jira не доступна. Мониторинг остановлен. Что будем делать?",
                                     "{\"keyboard\": [[\"Проверь тикеты\"], [\"Кто сейчас дежурит?\"], [\"Помоги с дежурством\"], [\"Пока ничего\"]],\"resize_keyboard\":true,\"one_time_keyboard\":true}");
                                 user.State = 3;
-                                repository.Update<User>(user);
+                                repository.Update(user);
                             }
                         }
                         var logReccord = new Log
@@ -278,7 +274,7 @@ namespace DutyBot
                             Exception = ex.GetType() + ": " + ex.Message,
                             AddInfo = ""
                         };
-                        repository.Create<Log>(logReccord);
+                        repository.Create(logReccord);
                         Thread.Sleep(30000);
                     }
                 }
@@ -313,7 +309,7 @@ namespace DutyBot
                             Exception = ex.GetType() + ": " + ex.Message,
                             AddInfo = ""
                         };
-                        repository.Create<Log>(logReccord);
+                        repository.Create(logReccord);
                     }
                     Thread.Sleep(5000);
                 }
@@ -344,7 +340,7 @@ namespace DutyBot
                     }
                 }   
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 _bot.SendMessage(message.chat.id, "Что-то пошло не так при обращении к базе данных. Дальнейшая работа не возможна.");
                 Thread.Sleep(5000);
@@ -385,7 +381,6 @@ namespace DutyBot
                                 _bot.SendMessage(message.chat.id,
                                     @"Очень жаль, но если надумешь, пиши. Я забуду об этом неприятном разговоре");
                                 repository.Delete(user);
-                                break;
                             }
 
                             break;
@@ -410,15 +405,12 @@ namespace DutyBot
                                 user.State = 3;
                                 break;
                             }
-                            else
-                            {
-                                _bot.SendMessage(message.chat.id,
-                                    @"Доступа к JIra нет. Возможно учётные данные не верны. Давай попробуем ввести их еще раз. ",
-                                    "{\"keyboard\": [[\"Ввести учётку еще раз\"]],\"resize_keyboard\":true,\"one_time_keyboard\":true}");
+                            _bot.SendMessage(message.chat.id,
+                                @"Доступа к JIra нет. Возможно учётные данные не верны. Давай попробуем ввести их еще раз. ",
+                                "{\"keyboard\": [[\"Ввести учётку еще раз\"]],\"resize_keyboard\":true,\"one_time_keyboard\":true}");
 
-                                user.State = 0;
-                                break;
-                            }
+                            user.State = 0;
+                            break;
                         case 3:
                             switch (message.text)
                             {
@@ -468,7 +460,7 @@ namespace DutyBot
                                                 Exception = ex.GetType() + ": " + ex.Message,
                                                 AddInfo = ""
                                             };
-                                            repository.Create<Log>(logReccord);
+                                            repository.Create(logReccord);
                                     }
 
                                     break;
@@ -497,20 +489,17 @@ namespace DutyBot
                                             "{\"keyboard\": [[\"Проверь тикеты\"], [\"Кто сейчас дежурит?\"], [\"Помоги с дежурством\"], [\"Пока ничего\"]],\"resize_keyboard\":true,\"one_time_keyboard\":true}");
                                         break;
                                     }
-                                    else
-                                    {
-                                        _bot.SendMessage(message.chat.id,
-                                            "Я буду мониторить тикеты с " +
-                                            DbReader.Readuserdutystart(message.chat.id).ToShortDateString() + " " +
-                                            DbReader.Readuserdutystart(message.chat.id).ToShortTimeString() + " по " +
-                                            DbReader.Readuserdutyend(message.chat.id).ToShortDateString() + " " +
-                                            DbReader.Readuserdutyend(message.chat.id).ToShortTimeString());
+                                    _bot.SendMessage(message.chat.id,
+                                        "Я буду мониторить тикеты с " +
+                                        DbReader.Readuserdutystart(message.chat.id).ToShortDateString() + " " +
+                                        DbReader.Readuserdutystart(message.chat.id).ToShortTimeString() + " по " +
+                                        DbReader.Readuserdutyend(message.chat.id).ToShortDateString() + " " +
+                                        DbReader.Readuserdutyend(message.chat.id).ToShortTimeString());
 
-                                        user.State = 5;
-                                        user.DutyStart = DbReader.Readuserdutystart(message.chat.id);
-                                        user.DutyEnd = DbReader.Readuserdutyend(message.chat.id);
-                                        break;
-                                    }
+                                    user.State = 5;
+                                    user.DutyStart = DbReader.Readuserdutystart(message.chat.id);
+                                    user.DutyEnd = DbReader.Readuserdutyend(message.chat.id);
+                                    break;
                                 default:
                                     _bot.SendMessage(message.chat.id, "Чем я могу помочь?",
                                 "{\"keyboard\": [[\"Проверь тикеты\"], [\"Кто сейчас дежурит?\"], [\"Помоги с дежурством\"], [\"Пока ничего\"]],\"resize_keyboard\":true,\"one_time_keyboard\":true}");
@@ -686,7 +675,7 @@ namespace DutyBot
                             }
                             break;
                     }
-                    repository.Update<User>(user);
+                    repository.Update(user);
                 }
             }
             catch (Exception ex)
@@ -695,7 +684,7 @@ namespace DutyBot
                 {
                     if(user.State > 3) user.State = 3;
                     _bot.SendMessage(message.chat.id, "Что-то пошло не так при обработке сообщения.");
-                    repository.Update<User>(user);
+                    repository.Update(user);
 
                     var logReccord = new Log
                         {
@@ -706,7 +695,7 @@ namespace DutyBot
                             Exception = ex.Message,
                             AddInfo = ""
                         };
-                        repository.Create<Log>(logReccord);
+                        repository.Create(logReccord);
                 }
                 Thread.Sleep(5000);
             }

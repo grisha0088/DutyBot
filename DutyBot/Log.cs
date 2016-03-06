@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DutyBot
 {
@@ -18,16 +14,12 @@ namespace DutyBot
         public string AddInfo { get; set; }
     }
 
-    public class NotDelete : System.Attribute
+    public class NotDelete : Attribute
     {
         public bool notDelete;
-
         public NotDelete(bool v)
         {
-            this.notDelete = v;
+            notDelete = v;
         }
-
-     
     }
-
 }

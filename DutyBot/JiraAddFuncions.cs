@@ -46,7 +46,7 @@ namespace DutyBot
                         Exception = ex.GetType() + ": " + ex.Message,
                         AddInfo = issue.Key.Value
                     };
-                    repository.Create<Log>(logReccord);
+                    repository.Create(logReccord);
                 }
 
                 user.State -= 1;
@@ -108,7 +108,7 @@ namespace DutyBot
                         Exception = ex.GetType() + ": " + ex.Message,
                         AddInfo = issue.Key.Value
                     };
-                    repository.Create<Log>(logReccord);
+                    repository.Create(logReccord);
                 }
                 user.State = state;
                 bot.SendMessage(message.chat.id, "Что-то пошло не так.", "{\"keyboard\": [[\"Проверь тикеты\"], [\"Кто сейчас дежурит?\"], [\"Помоги с дежурством\"], [\"Пока ничего\"]],\"resize_keyboard\":true,\"one_time_keyboard\":true}");
@@ -124,7 +124,7 @@ namespace DutyBot
             jiraConn = Jira.CreateRestClient("https://jira.2gis.ru/", login, password);
             try
             {
-                var issues = jiraConn.GetFilters();
+                jiraConn.GetFilters();
                 return true;
             }
             catch
