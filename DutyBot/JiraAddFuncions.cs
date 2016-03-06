@@ -35,7 +35,20 @@ namespace DutyBot
             }
             catch (Exception ex)
             {
-                Logger.LogException("error", message.chat.id, "AssingTicket", ex.GetType() + ": " + ex.Message, issue.Key.Value);
+                using (var repository = new Repository<DutyBotDbContext>())
+                {
+                    var logReccord = new Log
+                    {
+                        Date = DateTime.Now,
+                        MessageTipe = "error",
+                        UserId = message.chat.id,
+                        Operation = "AssingTicket",
+                        Exception = ex.GetType() + ": " + ex.Message,
+                        AddInfo = issue.Key.Value
+                    };
+                    repository.Create<Log>(logReccord);
+                }
+
                 user.State -= 1;
                 user.TicketNumber = "";
                 bot.SendMessage(message.chat.id, "Что-то пошло не так.", "{\"keyboard\": [[\"Проверь тикеты\"], [\"Кто сейчас дежурит?\"], [\"Помоги с дежурством\"], [\"Пока ничего\"]],\"resize_keyboard\":true,\"one_time_keyboard\":true}");
@@ -84,15 +97,21 @@ namespace DutyBot
             }
             catch (Exception ex)
             {
-                Logger.LogException("error", message.chat.id, "ResolveTicket", ex.GetType() + ": " + ex.Message, issue.Key.Value);
-                using (var db = new DutyBotDbContext())
+                using (var repository = new Repository<DutyBotDbContext>())
                 {
-                    user = db.Users.Find(user.Id);
-                    user.State = state;
-                    db.SaveChanges();
+                    var logReccord = new Log
+                    {
+                        Date = DateTime.Now,
+                        MessageTipe = "error",
+                        UserId = message.chat.id,
+                        Operation = "ResolveTicket",
+                        Exception = ex.GetType() + ": " + ex.Message,
+                        AddInfo = issue.Key.Value
+                    };
+                    repository.Create<Log>(logReccord);
                 }
+                user.State = state;
                 bot.SendMessage(message.chat.id, "Что-то пошло не так.", "{\"keyboard\": [[\"Проверь тикеты\"], [\"Кто сейчас дежурит?\"], [\"Помоги с дежурством\"], [\"Пока ничего\"]],\"resize_keyboard\":true,\"one_time_keyboard\":true}");
-
             }
         }
 

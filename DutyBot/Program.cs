@@ -46,26 +46,69 @@ namespace DutyBot
                 Sender.Send("https://api.telegram.org/bot179261100:AAGqaQ8Fum0xK8JQL0FE_N4LugS_MmO36zM/sendmessage?chat_id=38651047&text=" + "Запущен сервис DutyBot");
                 try
                 {
-                    Logger.LogOpperation("info", 1, "StartService", "");
+                    using (var repository = new Repository<DutyBotDbContext>())
+                    {
+                        var logReccord = new Log
+                        {
+                            Date = DateTime.Now,
+                            MessageTipe = "info",
+                            UserId = 0,
+                            Operation = "StartService",
+                            Exception = "",
+                            AddInfo = ""
+                        };
+                        repository.Create<Log>(logReccord);
+
+                    }
                 }
                 catch(Exception ex)
                 {
                     Thread.Sleep(10000); // еcли не доступна БД и не получается залогировать запуск, ждём 10 секунд и пробуем еще раз.
                     try
                     {
-                        Logger.LogOpperation("info", 1, "StartService", "");
+                        using (var repository = new Repository<DutyBotDbContext>())
+                        {
+                            var exReccord = new Log
+                            {
+                                Date = DateTime.Now,
+                                MessageTipe = "error",
+                                UserId = 0,
+                                Operation = "StartService",
+                                Exception = ex.GetType() + ": " + ex.Message,
+                                AddInfo = ""
+                            };
+                            repository.Create<Log>(exReccord);
+
+                            var logReccord = new Log
+                            {
+                                Date = DateTime.Now,
+                                MessageTipe = "info",
+                                UserId = 0,
+                                Operation = "StartService2",
+                                Exception = "",
+                                AddInfo = ""
+                            };
+                            repository.Create<Log>(logReccord);
+                        }
                     }
                     catch
                     {
-                        Sender.Send("https://api.telegram.org/bot179261100:AAGqaQ8Fum0xK8JQL0FE_N4LugS_MmO36zM/sendmessage?chat_id=38651047&text=Произошла ошибка при запуске службы. Подождал 10 секунд, но ошибка осталась: " + ex);
+                        Sender.Send("https://api.telegram.org/bot179261100:AAGqaQ8Fum0xK8JQL0FE_N4LugS_MmO36zM/sendmessage?chat_id=38651047&text=Произошла ошибка при запуске службы. Подождал 10 секунд, попробовал еще раз, но ошибка осталась: " + ex);
                     }
                 }
-
-                _bot = new TelegramBot(DbReader.Readbot());
                 
+                using (var repository = new Repository<DutyBotDbContext>())  //инициализирую парамтры приложения
+                {
+                    _botParam = repository.Get<Parametr>(p => p.Name == "TelegramBot");
+                    _jiraParam = repository.Get<Parametr>(p => p.Name == "jira");
+                    _userLoginParam = repository.Get<Parametr>(p => p.Name == "dafaultuserlogin");
+                    _userPasswordParam = repository.Get<Parametr>(p => p.Name == "dafaultuserpassword");
+                    _filterParam = repository.Get<Parametr>(p => p.Name == "Filter");
+                }
+
+                _bot = new TelegramBot(_botParam.Value);
                 _readmessageThread = new Thread(Readmessages);  //запускаю поток по считыванию и обработке сообщений из telegramm
                 _readmessageThread.Start();
-
                 _checkTicketsThread = new Thread(Checkjira);   //запускаю поток по проверке тикетов в jira
                 _checkTicketsThread.Start();
                 
@@ -73,7 +116,19 @@ namespace DutyBot
             catch (Exception ex)
             {
                 Sender.Send("https://api.telegram.org/bot179261100:AAGqaQ8Fum0xK8JQL0FE_N4LugS_MmO36zM/sendmessage?chat_id=38651047&text=" + ex.Message);
-                Logger.LogException("fatal", 1, "StartService", ex.GetType() + ": " + ex.Message, "");
+                using (var repository = new Repository<DutyBotDbContext>())
+                {
+                    var logReccord = new Log
+                    {
+                        Date = DateTime.Now,
+                        MessageTipe = "fatal",
+                        UserId = 0,
+                        Operation = "StartService",
+                        Exception = ex.GetType() + ": " + ex.Message,
+                        AddInfo = ""
+                    };
+                    repository.Create<Log>(logReccord);
+                }
             }
         }
         public void Stop()  //метод вызывается при остановке службы
@@ -81,14 +136,37 @@ namespace DutyBot
             try
             {
                 Sender.Send("https://api.telegram.org/bot179261100:AAGqaQ8Fum0xK8JQL0FE_N4LugS_MmO36zM/sendmessage?chat_id=38651047&text=" + "Остановлен сервис DutyBot");
-                Logger.LogOpperation("info", 1, "StopService", "");
-
+                using (var repository = new Repository<DutyBotDbContext>())
+                {
+                    var logReccord = new Log
+                    {
+                        Date = DateTime.Now,
+                        MessageTipe = "info",
+                        UserId = 0,
+                        Operation = "StopService",
+                        Exception = "",
+                        AddInfo = ""
+                    };
+                    repository.Create<Log>(logReccord);
+                }
                 _readmessagesflag = false; 
                 _checkjiraflag = false;
             }
             catch (Exception ex)
             {
-                Logger.LogException("fatal", 1, "StopService", ex.GetType() + ": " + ex.Message, "");
+                using (var repository = new Repository<DutyBotDbContext>())
+                {
+                    var logReccord = new Log
+                    {
+                        Date = DateTime.Now,
+                        MessageTipe = "fatal",
+                        UserId = 0,
+                        Operation = "StopService",
+                        Exception = ex.GetType() + ": " + ex.Message,
+                        AddInfo = ""
+                    };
+                    repository.Create<Log>(logReccord);
+                }
             }
         }
 
@@ -100,10 +178,20 @@ namespace DutyBot
         private Issue _ticket; //тикет в jira, используется в потоке при проверке тикетов вручную
         private bool _readmessagesflag = true; //пока true, работает потог чтения сообщений
         private bool _checkjiraflag = true; //пока true, работает потог проверки jira
+        private Parametr _jiraParam;
+        private Parametr _userLoginParam;
+        private Parametr _userPasswordParam;
+        private Parametr _filterParam;
+        private Parametr _botParam;
+
 
         public void Checkjira() // метод запускается в потоке _checkTicketsThread и вычитывает тикеты из фильтра в jira
         {
-            _jiraConn = Jira.CreateRestClient(DbReader.Readjira(), DbReader.Readdefaultuser(), DbReader.Readdefaultpassword());
+            using (var repository = new Repository<DutyBotDbContext>())
+            {
+
+            }
+            _jiraConn = Jira.CreateRestClient(_jiraParam.Value, _userLoginParam.Value, _userPasswordParam.Value);
             while (_checkjiraflag)
             {
                 try  //если дежурство закончилось сбрасываю статус пользователя на 3
@@ -120,17 +208,26 @@ namespace DutyBot
                 }
                 catch (Exception ex)
                 {
-                    Logger.LogException("error", 1, "FinishDuty", ex.GetType() + ": " + ex.Message, "");
+                    using (var repository = new Repository<DutyBotDbContext>())
+                    {
+                        var logReccord = new Log
+                        {
+                            Date = DateTime.Now,
+                            MessageTipe = "error",
+                            UserId = 0,
+                            Operation = "FinishDuty",
+                            Exception = ex.GetType() + ": " + ex.Message,
+                            AddInfo = ""
+                        };
+                        repository.Create<Log>(logReccord);
+                    }
                 }
-
 
                 //вычитываю тикеты из заданного фильтра
                 try
                 {
-
-                    var issues = _jiraConn.GetIssuesFromJql(DbReader.Readfilter());
+                    var issues = _jiraConn.GetIssuesFromJql(_filterParam.Value);
                     var enumerable = issues as IList<Issue> ?? issues.ToList();
-
                     using (var repository = new Repository<DutyBotDbContext>())
                     {
                         var users =
@@ -141,7 +238,7 @@ namespace DutyBot
                             _issue = enumerable.Last();
                             foreach (var user in users)
                             {
-                                _jiraConn = Jira.CreateRestClient(DbReader.Readjira(), user.Login, user.Password);
+                                _jiraConn = Jira.CreateRestClient(_jiraParam.Value, user.Login, user.Password);
                                 user.TicketNumber = _issue.Key.ToString();
                                 _bot.SendMessage(user.TlgNumber, _issue);
                                 repository.Update<User>(user);
@@ -172,7 +269,16 @@ namespace DutyBot
                                 repository.Update<User>(user);
                             }
                         }
-                        Logger.LogException("error", 1, "ReadTicketsFromJira", ex.Message, "");
+                        var logReccord = new Log
+                        {
+                            Date = DateTime.Now,
+                            MessageTipe = "error",
+                            UserId = 0,
+                            Operation = "ReadTicketsFromJira",
+                            Exception = ex.GetType() + ": " + ex.Message,
+                            AddInfo = ""
+                        };
+                        repository.Create<Log>(logReccord);
                         Thread.Sleep(30000);
                     }
                 }
@@ -196,7 +302,19 @@ namespace DutyBot
                 }
                 catch (Exception ex)
                 {
-                    Logger.LogException("error", 1, "GetTelegrammUpdates", ex.Message, "");
+                    using (var repository = new Repository<DutyBotDbContext>())
+                    {
+                        var logReccord = new Log
+                        {
+                            Date = DateTime.Now,
+                            MessageTipe = "error",
+                            UserId = 0,
+                            Operation = "GetTelegrammUpdates",
+                            Exception = ex.GetType() + ": " + ex.Message,
+                            AddInfo = ""
+                        };
+                        repository.Create<Log>(logReccord);
+                    }
                     Thread.Sleep(5000);
                 }
             }
@@ -222,15 +340,13 @@ namespace DutyBot
                             Password = "",
                             TicketNumber = ""
                         };
-                        repository.Create<User>(user);
+                        repository.Create(user);
                     }
                 }   
             }
             catch (Exception ex)
             {
-                _bot.SendMessage(message.chat.id, "Что-то пошло не так при обращении. Дальнейшая работа не возможна.");
-
-                Logger.LogException("error", message.chat.id, "CreateUserObject", ex.Message, "");
+                _bot.SendMessage(message.chat.id, "Что-то пошло не так при обращении к базе данных. Дальнейшая работа не возможна.");
                 Thread.Sleep(5000);
                 return;
             }
@@ -268,6 +384,7 @@ namespace DutyBot
                             {
                                 _bot.SendMessage(message.chat.id,
                                     @"Очень жаль, но если надумешь, пиши. Я забуду об этом неприятном разговоре");
+                                repository.Delete(user);
                                 break;
                             }
 
@@ -315,13 +432,13 @@ namespace DutyBot
                                         "{\"keyboard\": [[\"Проверь тикеты\"], [\"Кто сейчас дежурит?\"], [\"Помоги с дежурством\"], [\"Пока ничего\"]],\"resize_keyboard\":true,\"one_time_keyboard\":true}");
                                     break;
                                 case "Проверь тикеты":
-                                    _jiraConn = Jira.CreateRestClient(DbReader.Readjira(),
+                                    _jiraConn = Jira.CreateRestClient(_jiraParam.Value,
                                         user.Login, user.Password);
 
                                     try
                                     {
                                         var issues =
-                                            _jiraConn.GetIssuesFromJql(DbReader.Readfilter());
+                                            _jiraConn.GetIssuesFromJql(_filterParam.Value);
                                         IList<Issue> enumerable = issues as IList<Issue> ?? issues.ToList();
                                         if (enumerable.Any())
                                         {
@@ -342,7 +459,16 @@ namespace DutyBot
                                     {
                                         _bot.SendMessage(message.chat.id, "Jira не доступна",
                                             "{\"keyboard\": [[\"Проверь тикеты\"], [\"Кто сейчас дежурит?\"], [\"Помоги с дежурством\"], [\"Пока ничего\"]],\"resize_keyboard\":true,\"one_time_keyboard\":true}");
-                                        Logger.LogException("error", 1, "SendThatJiraDoesNotWork", ex.Message, "");
+                                            var logReccord = new Log
+                                            {
+                                                Date = DateTime.Now,
+                                                MessageTipe = "error",
+                                                UserId = 0,
+                                                Operation = "SendThatJiraDoesNotWork",
+                                                Exception = ex.GetType() + ": " + ex.Message,
+                                                AddInfo = ""
+                                            };
+                                            repository.Create<Log>(logReccord);
                                     }
 
                                     break;
@@ -567,15 +693,23 @@ namespace DutyBot
             {
                 using (var repository = new Repository<DutyBotDbContext>())
                 {
-                    user.State = 3;
-                    _bot.SendMessage(message.chat.id, "Что-то пошло не так при обработке сообщения.",
-                        "{\"keyboard\": [[\"Проверь тикеты\"], [\"Кто сейчас дежурит?\"], [\"Помоги с дежурством\"], [\"Пока ничего\"]],\"resize_keyboard\":true,\"one_time_keyboard\":true}");
-                    Logger.LogException("error", message.chat.id, "ProcessMessage", ex.Message, "");
+                    if(user.State > 3) user.State = 3;
+                    _bot.SendMessage(message.chat.id, "Что-то пошло не так при обработке сообщения.");
                     repository.Update<User>(user);
+
+                    var logReccord = new Log
+                        {
+                            Date = DateTime.Now,
+                            MessageTipe = "info",
+                            UserId = message.chat.id,
+                            Operation = "ProcessMessage",
+                            Exception = ex.Message,
+                            AddInfo = ""
+                        };
+                        repository.Create<Log>(logReccord);
                 }
                 Thread.Sleep(5000);
             }
         }
-        
     }
 }

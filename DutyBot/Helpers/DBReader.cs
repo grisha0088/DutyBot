@@ -14,172 +14,127 @@ namespace DutyBot
         #endif
 
 
-        public static string Readbot()
-        {
-            string query = @"
-     SELECT [ValueString]
-  FROM  [dbo].[Parametrs]
-  where Parametr = 'TelegramBot'";
-            using (SqlConnection conn = new SqlConnection(dutyBotDB))
-            {
-                conn.Open();
-                using (SqlCommand todc1 = new SqlCommand(query, conn))
-                {
-                    var a = (string)todc1.ExecuteScalar();
-                    return a;
-                }
-            }
-        }
+  //      public static string Readbot()
+  //      {
+  //          string query = @"
+  //   SELECT [ValueString]
+  //FROM  [dbo].[Parametrs]
+  //where Parametr = 'TelegramBot'";
+  //          using (SqlConnection conn = new SqlConnection(dutyBotDB))
+  //          {
+  //              conn.Open();
+  //              using (SqlCommand todc1 = new SqlCommand(query, conn))
+  //              {
+  //                  var a = (string)todc1.ExecuteScalar();
+  //                  return a;
+  //              }
+  //          }
+  //      }
 
  
 
-        public static string Readjira()
-        {
-            const string query = @"
-     SELECT [ValueString]
-  FROM  [dbo].[Parametrs]
-  where Parametr = 'jira'";
-            using (SqlConnection conn = new SqlConnection(dutyBotDB))
-            {
-                conn.Open();
-                using (SqlCommand todc1 = new SqlCommand(query, conn))
-                {
-                    var a = (string)todc1.ExecuteScalar();
-                    return a;
-                }
-            }
-        }
+  //      public static string Readjira()
+  //      {
+  //          const string query = @"
+  //   SELECT [ValueString]
+  //FROM  [dbo].[Parametrs]
+  //where Parametr = 'jira'";
+  //          using (SqlConnection conn = new SqlConnection(dutyBotDB))
+  //          {
+  //              conn.Open();
+  //              using (SqlCommand todc1 = new SqlCommand(query, conn))
+  //              {
+  //                  var a = (string)todc1.ExecuteScalar();
+  //                  return a;
+  //              }
+  //          }
+  //      }
 
-        public static string Readdefaultuser()
-        {
-            const string query = @"
-     SELECT [ValueString]
-  FROM  [dbo].[Parametrs]
-  where Parametr = 'dafaultuserlogin'";
-            using (SqlConnection conn = new SqlConnection(dutyBotDB))
-            {
-                conn.Open();
-                using (SqlCommand todc1 = new SqlCommand(query, conn))
-                {
-                    var a = (string)todc1.ExecuteScalar();
-                    return a;
-                }
-            }
-        }
+  //      public static string Readdefaultuser()
+  //      {
+  //          const string query = @"
+  //   SELECT [ValueString]
+  //FROM  [dbo].[Parametrs]
+  //where Parametr = 'dafaultuserlogin'";
+  //          using (SqlConnection conn = new SqlConnection(dutyBotDB))
+  //          {
+  //              conn.Open();
+  //              using (SqlCommand todc1 = new SqlCommand(query, conn))
+  //              {
+  //                  var a = (string)todc1.ExecuteScalar();
+  //                  return a;
+  //              }
+  //          }
+  //      }
 
-        public static string Readdefaultpassword()
-        {
-            const string query = @"
-     SELECT [ValueString]
-  FROM  [dbo].[Parametrs]
-  where Parametr = 'dafaultuserpassword'";
-            using (SqlConnection conn = new SqlConnection(dutyBotDB))
-            {
-                conn.Open();
-                using (SqlCommand todc1 = new SqlCommand(query, conn))
-                {
-                    var a = (string)todc1.ExecuteScalar();
-                    return a;
-                }
-            }
-        }
+  //      public static string Readdefaultpassword()
+  //      {
+  //          const string query = @"
+  //   SELECT [ValueString]
+  //FROM  [dbo].[Parametrs]
+  //where Parametr = 'dafaultuserpassword'";
+  //          using (SqlConnection conn = new SqlConnection(dutyBotDB))
+  //          {
+  //              conn.Open();
+  //              using (SqlCommand todc1 = new SqlCommand(query, conn))
+  //              {
+  //                  var a = (string)todc1.ExecuteScalar();
+  //                  return a;
+  //              }
+  //          }
+  //      }
 
-        public static string Readfilter()
-        {
-            string a;
-            string query = @"
-  SELECT [ValueString]
-  FROM  [dbo].[Parametrs]
-  where Parametr = 'Filter'";
-            using (SqlConnection conn = new SqlConnection(dutyBotDB))
-            {
-                conn.Open();
-                using (SqlCommand todc1 = new SqlCommand(query, conn))
-                {
+  //      public static string Readfilter()
+  //      {
+  //          string a;
+  //          string query = @"
+  //SELECT [ValueString]
+  //FROM  [dbo].[Parametrs]
+  //where Parametr = 'Filter'";
+  //          using (SqlConnection conn = new SqlConnection(dutyBotDB))
+  //          {
+  //              conn.Open();
+  //              using (SqlCommand todc1 = new SqlCommand(query, conn))
+  //              {
 
-                    a = (string)todc1.ExecuteScalar();
-                    return a;
-                }
-            }
-        }
+  //                  a = (string)todc1.ExecuteScalar();
+  //                  return a;
+  //              }
+  //          }
+  //      }
 
 
-        public static int[] Readresppeople()
-        {
-            var users = new int[20];
-            using (var conn = new SqlConnection(dutyBotDB))
-            {
-                SqlCommand command = new SqlCommand(
-                  @"SELECT [Id]
-                    FROM  [dbo].[Users]
-                    where DutyStart <= GETDATE() and DutyEnd > GETDATE() and State = 5",
-                  conn);
-                conn.Open();
+  //      public static int[] Readresppeople()
+  //      {
+  //          var users = new int[20];
+  //          using (var conn = new SqlConnection(dutyBotDB))
+  //          {
+  //              SqlCommand command = new SqlCommand(
+  //                @"SELECT [Id]
+  //                  FROM  [dbo].[Users]
+  //                  where DutyStart <= GETDATE() and DutyEnd > GETDATE() and State = 5",
+  //                conn);
+  //              conn.Open();
 
-                SqlDataReader reader = command.ExecuteReader();
+  //              SqlDataReader reader = command.ExecuteReader();
                 
-                var i = 0;
+  //              var i = 0;
 
-                if (reader.HasRows)
-                {
-                    while (reader.Read())
-                    {
-                        users[i] = reader.GetInt32(0);
-                        i += 1;
-                    }
-                }
-                reader.Close();
-            }
+  //              if (reader.HasRows)
+  //              {
+  //                  while (reader.Read())
+  //                  {
+  //                      users[i] = reader.GetInt32(0);
+  //                      i += 1;
+  //                  }
+  //              }
+  //              reader.Close();
+  //          }
 
-            return users;
-        }
+  //          return users;
+  //      }
 
-        public static int[] Readallpeople()
-        {
-            var users = new int[20];
-            using (var conn = new SqlConnection(dutyBotDB))
-            {
-                var command = new SqlCommand(
-                  @"SELECT [Id]
-                    FROM  [dbo].[Users]",
-                  conn);
-                conn.Open();
-
-                SqlDataReader reader = command.ExecuteReader();
-
-                var i = 0;
-
-                if (reader.HasRows)
-                {
-                   
-                    while ( reader.Read())
-                    {
-                        users[i] = reader.GetInt32(0);
-                        i += 1;
-                        
-                    }
-                }
-                reader.Close();
-            }
-            return users;
-        }
-
-         public static int Readrespcount()
-         {
-             const string query = @"SELECT count([Id])
-  FROM  [dbo].[Users]
-  where [DutyEnd] > getdate()";
-             using (var conn = new SqlConnection(dutyBotDB))
-            {
-                conn.Open();
-                using (var todc1 = new SqlCommand(query, conn))
-                {
-                    var a = (int)todc1.ExecuteScalar();
-                    return a;
-                }
-            }
-         }
-
+  
         public static string Readrespersone()
         {
             string query = @"
@@ -369,7 +324,6 @@ select isnull(@start, '')      ";
         {
             string query = @"
   declare @userid int = " + userId + @"
-
   declare @DutyDate datetime
   declare @First nvarchar(max)
   declare @Second nvarchar(max)
@@ -381,13 +335,7 @@ select isnull(@start, '')      ";
   declare @start datetime
   declare @end datetime
   declare @flag int = 0
-
-
-
   set @user = (select [Name] from [Duty].[dbo].[UsersPreProduction] where [TelegramNumber] = @userid)
-
-
-
   declare ksn cursor LOCAL for select 
       DutyDate 
          ,[First]
@@ -396,18 +344,11 @@ select isnull(@start, '')      ";
          ,[Fourth] 
          ,[Fifth]
       ,[Sixth]
-      
-   
          from [Duty].[dbo].[Schedule_Internal]
          where DutyDate >= CONVERT(date, GETDATE()) 
          open ksn
 FETCH NEXT FROM ksn into @DutyDate, @First, @Second, @Third, @Fourth, @Fifth, @Sixth
-
-
-
 WHILE @@FETCH_STATUS = 0 BEGIN
-
-
 if (@First = @user and @flag = 0) 
 begin
 set @start = DATEADD(hour, 5, @DutyDate)
@@ -473,23 +414,15 @@ begin
 set @start = DATEADD(hour, 25, @DutyDate)
 set @flag = 1
 end
-
 if (@Sixth <> @user and @flag = 1) 
 begin
 set @end = DATEADD(hour, 25, @DutyDate)
 break 
 end
-
-
-
 FETCH NEXT FROM ksn into @DutyDate, @First, @Second, @Third, @Fourth, @Fifth, @Sixth
 END
-
-
 close ksn
 deallocate ksn
-
-
 select isnull(@end, '')      ";
             using (SqlConnection conn = new SqlConnection(dutyBotDB))
             {
@@ -501,9 +434,6 @@ select isnull(@end, '')      ";
                 }
             }
         }
-
     }
-
-
 }
 
