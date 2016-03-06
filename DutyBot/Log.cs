@@ -16,7 +16,8 @@ namespace DutyBot
 
     public class NotDelete : Attribute
     {
-        public bool notDelete;
+        public bool notDelete { get; }
+
         public NotDelete(bool v)
         {
             notDelete = v;
