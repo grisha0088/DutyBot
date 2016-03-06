@@ -6,13 +6,7 @@ namespace DutyBot
 {
     class DbReader
     {
-        #if DEBUG
-        static readonly string dutyBotDB = "Data Source=uk-duty01\\duty01;Initial Catalog=DutyBot_debug; Integrated Security=false; User ID=DutyBot; Password=123qwe!;";
-
-        #else
-        static readonly string dutyBotDB = "Data Source=uk-duty01\\duty01;Initial Catalog=DutyBot; Integrated Security=false; User ID=DutyBot; Password=123qwe!;";
-        #endif
-
+        static readonly string dutyBotDB = "Data Source=uk-duty01\\duty01;Initial Catalog=Duty; Integrated Security=false; User ID=DutyBot; Password=123qwe!;";
         public static string Readrespersone()
         {
             string query = @"

@@ -523,7 +523,7 @@ namespace DutyBot
                                         JiraAddFuncions.AssingTicket(user, _ticket, message, user.Login, _bot, _jiraConn);
                                         break;
                                     case "Технологи":
-                                        JiraAddFuncions.AssingTicket(user, _ticket, message, "tecnologsupport", _bot,
+                                        JiraAddFuncions.AssingTicket(user, _ticket, message, "technologsupport", _bot,
                                             _jiraConn);
                                         break;
                                     case "Коммерция":
@@ -594,7 +594,7 @@ namespace DutyBot
                                     JiraAddFuncions.AssingTicket(user, _issue, message, user.Login, _bot, _jiraConn);
                                     break;
                                 case "Технологи":
-                                    JiraAddFuncions.AssingTicket(user, _issue, message, "tecnologsupport", _bot,
+                                    JiraAddFuncions.AssingTicket(user, _issue, message, "technologsupport", _bot,
                                         _jiraConn);
                                     break;
                                 case "Коммерция":
