@@ -198,7 +198,7 @@ namespace DutyBot
                         foreach(var user in users)
                         {
                             user.State = 3;
-                            repository.Update(user);
+                            repository.Update();
                         }
                     }
                 }
@@ -237,7 +237,7 @@ namespace DutyBot
                                 _jiraConn = Jira.CreateRestClient(_jiraParam.Value, user.Login, user.Password);
                                 user.TicketNumber = _issue.Key.ToString();
                                 _bot.SendMessage(user.TlgNumber, _issue);
-                                repository.Update(user);
+                                repository.Update();
                             }
                         }
                         else
@@ -262,7 +262,7 @@ namespace DutyBot
                                     "Похоже, что jira не доступна. Мониторинг остановлен. Что будем делать?",
                                     "{\"keyboard\": [[\"Проверь тикеты\"], [\"Кто сейчас дежурит?\"], [\"Помоги с дежурством\"], [\"Пока ничего\"]],\"resize_keyboard\":true,\"one_time_keyboard\":true}");
                                 user.State = 3;
-                                repository.Update(user);
+                                repository.Update();
                             }
                         }
                         var logReccord = new Log
@@ -675,7 +675,7 @@ namespace DutyBot
                             }
                             break;
                     }
-                    repository.Update(user);
+                    repository.Update();
                 }
             }
             catch (Exception ex)
@@ -684,7 +684,7 @@ namespace DutyBot
                 {
                     if(user.State > 3) user.State = 3;
                     _bot.SendMessage(message.chat.id, "Что-то пошло не так при обработке сообщения.");
-                    repository.Update(user);
+                    repository.Update();
 
                     var logReccord = new Log
                         {

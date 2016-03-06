@@ -47,7 +47,7 @@ namespace DutyBot
             return DataContext.Set<TEntity>();
         }
 
-        public virtual bool Update<TEntity>(TEntity entity) where TEntity : class
+        public virtual bool Update()
         {
             return DataContext.SaveChanges() > 0;
         }
