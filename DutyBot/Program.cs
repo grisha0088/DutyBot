@@ -644,9 +644,16 @@ namespace DutyBot
                                     break;
                                 }
 
+                                case "Продолжить мониторинг":
+                                    {
+                                        user.State = 6;
+                                        _bot.SendMessage(message.chat.id, "Хорошо, продолжим");
+                                        break;
+                                    }
+
                                 default:
                                     _bot.SendMessage(message.chat.id, "да?",
-                                        "{\"keyboard\": [[\"Остановить мониторинг\"]],\"resize_keyboard\":true,\"one_time_keyboard\":true}");
+                                        "{\"keyboard\": [[\"Остановить мониторинг\"], [\"Продолжить мониторинг\"]],\"resize_keyboard\":true,\"one_time_keyboard\":true}");
                                     break;
                             }
                             break;
@@ -664,7 +671,7 @@ namespace DutyBot
                                     }
                                     default:
                                         _bot.SendMessage(message.chat.id, "да?",
-                                            "{\"keyboard\": [[\"Остановить мониторинг\"]],\"resize_keyboard\":true,\"one_time_keyboard\":true}");
+                                            "{\"keyboard\": [[\"Остановить мониторинг\"], [\"Продолжить мониторинг\"]],\"resize_keyboard\":true,\"one_time_keyboard\":true}");
                                         break;
                                 }
                             }
