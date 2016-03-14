@@ -62,13 +62,9 @@ namespace DutyBot
             try
             {
                 issue.Refresh();
-                if (issue.Assignee == null & issue.Key.ToString().Equals(user.TicketNumber))
+                if (issue.Assignee == null & issue.Key.ToString().Equals(user.TicketNumber) & issue.Status.ToString() != "5")
                 {
-                    if (issue.Status.ToString() != "5")
-                    {
-                        issue.WorkflowTransition("Решить");
-                    }
-
+                    issue.WorkflowTransition(issue.Reporter != "Uk.Jira.Extuser" ? "Решить" : " Решить ");
                     issue.Assignee = assignee;
                     issue.SaveChanges();
 

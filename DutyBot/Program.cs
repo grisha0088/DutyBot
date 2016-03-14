@@ -36,7 +36,6 @@ namespace DutyBot
         }
     }
 
-
     internal class Prog
     {
         public void Start() //метод вызывается при старте службы
@@ -58,7 +57,6 @@ namespace DutyBot
                             AddInfo = ""
                         };
                         repository.Create(logReccord);
-
                     }
                 }
                 catch(Exception ex)
@@ -78,7 +76,6 @@ namespace DutyBot
                                 AddInfo = ""
                             };
                             repository.Create(exReccord);
-
                             var logReccord = new Log
                             {
                                 Date = DateTime.Now,
@@ -105,7 +102,6 @@ namespace DutyBot
                     _userPasswordParam = repository.Get<Parametr>(p => p.Name == "dafaultuserpassword");
                     _filterParam = repository.Get<Parametr>(p => p.Name == "Filter");
                 }
-
                 _bot = new TelegramBot(_botParam.Value);
                 _readmessageThread = new Thread(Readmessages);  //запускаю поток по считыванию и обработке сообщений из telegramm
                 _readmessageThread.Start();
@@ -218,7 +214,6 @@ namespace DutyBot
                         repository.Create(logReccord);
                     }
                 }
-
                 //вычитываю тикеты из заданного фильтра
                 try
                 {
