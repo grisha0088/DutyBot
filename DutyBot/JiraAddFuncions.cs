@@ -7,8 +7,15 @@ namespace DutyBot
 {
     static class JiraAddFuncions
     {
-        public static void AssingTicket(User user, Issue issue, Message message, string assignee, TelegramBot bot, Jira jiraConn, string keyboard = "{\"keyboard\": [[\"Проверь тикеты\"], [\"Кто сейчас дежурит?\"], [\"Помоги с дежурством\"], [\"Пока ничего\"]],\"resize_keyboard\":true,\"one_time_keyboard\":true}")
+        public static void AssingTicket(User user, Issue issue, Message message, string assignee, TelegramBot bot, Jira jiraConn)
         {
+            int state = user.State - 1; //безумный костыль для того, чтобы вычислять статус, который нужно перевсети пользоваетля. Так получилось, что это 3 для 4 статуса, и 5 для 6 статуса. 
+            string keyboard = null;
+            if (state == 3)
+            {
+                keyboard =
+                    "{\"keyboard\": [[\"Проверь тикеты\"], [\"Кто сейчас дежурит?\"], [\"Помоги с дежурством\"], [\"Пока ничего\"]],\"resize_keyboard\":true,\"one_time_keyboard\":true}";
+            }
             try
             {
                 issue.Refresh();
@@ -22,13 +29,13 @@ namespace DutyBot
                     issue.Assignee = assignee;
                     issue.SaveChanges();
 
-                    user.State -= 1; //безумный костыль для того, чтобы вычислять статус, который нужно перевсети пользоваетля. Так получилось, что это 3 для 4 статуса, и 5 для 6 статуса. 
+                    user.State = state; 
                     user.TicketNumber = "";
                     bot.SendMessage(message.chat.id, "Готово.", keyboard);
                 }
                 else
                 {
-                    user.State -= 1;
+                    user.State = state;
                     user.TicketNumber = "";
                     bot.SendMessage(message.chat.id, "Тикет уже распределён", keyboard);
                 }
@@ -49,16 +56,22 @@ namespace DutyBot
                     repository.Create(logReccord);
                 }
 
-                user.State -= 1;
+                user.State = 3;
                 user.TicketNumber = "";
                 bot.SendMessage(message.chat.id, "Что-то пошло не так.", "{\"keyboard\": [[\"Проверь тикеты\"], [\"Кто сейчас дежурит?\"], [\"Помоги с дежурством\"], [\"Пока ничего\"]],\"resize_keyboard\":true,\"one_time_keyboard\":true}");
 
             }
         }
 
-        public static void ResolveTicket(User user, Issue issue, Message message, string assignee, TelegramBot bot, Jira jiraConn, string keyboard = "{\"keyboard\": [[\"Проверь тикеты\"], [\"Кто сейчас дежурит?\"], [\"Помоги с дежурством\"], [\"Пока ничего\"]],\"resize_keyboard\":true,\"one_time_keyboard\":true}")
+        public static void ResolveTicket(User user, Issue issue, Message message, string assignee, TelegramBot bot, Jira jiraConn)
         {
             int state = user.State - 1; //безумный костыль для того, чтобы вычислять статус, который нужно перевсети пользоваетля. Так получилось, что это 3 для 4 статуса, и 5 для 6 статуса. 
+            string keyboard = null;
+            if (state == 3)
+            {
+                keyboard =
+                    "{\"keyboard\": [[\"Проверь тикеты\"], [\"Кто сейчас дежурит?\"], [\"Помоги с дежурством\"], [\"Пока ничего\"]],\"resize_keyboard\":true,\"one_time_keyboard\":true}";
+            }
             try
             {
                 issue.Refresh();
@@ -106,7 +119,7 @@ namespace DutyBot
                     };
                     repository.Create(logReccord);
                 }
-                user.State = state;
+                user.State = 3;
                 bot.SendMessage(message.chat.id, "Что-то пошло не так.", "{\"keyboard\": [[\"Проверь тикеты\"], [\"Кто сейчас дежурит?\"], [\"Помоги с дежурством\"], [\"Пока ничего\"]],\"resize_keyboard\":true,\"one_time_keyboard\":true}");
             }
         }
