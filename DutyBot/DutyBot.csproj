@@ -39,6 +39,14 @@
       <HintPath>..\packages\Atlassian.SDK.5.11.0\lib\Atlassian.Jira.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Newtonsoft.Json, Version=8.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.8.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
@@ -48,6 +56,7 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -60,19 +69,54 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DutyBotDbContext.cs" />
     <Compile Include="JiraAddFuncions.cs" />
+    <Compile Include="Log.cs" />
+    <Compile Include="Migrations\201602230701061_AddUsers.cs" />
+    <Compile Include="Migrations\201602230701061_AddUsers.Designer.cs">
+      <DependentUpon>201602230701061_AddUsers.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201602230726506_Changetipe.cs" />
+    <Compile Include="Migrations\201602230726506_Changetipe.Designer.cs">
+      <DependentUpon>201602230726506_Changetipe.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201602250559047_AddTelegrumNumber.cs" />
+    <Compile Include="Migrations\201602250559047_AddTelegrumNumber.Designer.cs">
+      <DependentUpon>201602250559047_AddTelegrumNumber.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201602251117362_LogsAndParametrs.cs" />
+    <Compile Include="Migrations\201602251117362_LogsAndParametrs.Designer.cs">
+      <DependentUpon>201602251117362_LogsAndParametrs.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\Configuration.cs" />
+    <Compile Include="Parametr.cs" />
+    <Compile Include="Repository.cs" />
     <Compile Include="Telegram\Classes.cs" />
     <Compile Include="Telegram\Bot.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Helpers\Logger.cs" />
     <Compile Include="Telegram\Helpers\UrlClearer.cs" />
     <Compile Include="Helpers\DBReader.cs" />
     <Compile Include="Telegram\Helpers\Sender.cs" />
+    <Compile Include="User.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Migrations\201602230701061_AddUsers.resx">
+      <DependentUpon>201602230701061_AddUsers.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201602230726506_Changetipe.resx">
+      <DependentUpon>201602230726506_Changetipe.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201602250559047_AddTelegrumNumber.resx">
+      <DependentUpon>201602250559047_AddTelegrumNumber.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201602251117362_LogsAndParametrs.resx">
+      <DependentUpon>201602251117362_LogsAndParametrs.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
