@@ -61,7 +61,7 @@ namespace DutyBot
                 }
                 catch(Exception ex)
                 {
-                    Thread.Sleep(10000); // еcли не доступна БД и не получается залогировать запуск, ждём 10 секунд и пробуем еще раз.
+                    Thread.Sleep(30000); // еcли не доступна БД и не получается залогировать запуск, ждём 30 секунд и пробуем еще раз.
                     try
                     {
                         using (var repository = new Repository<DutyBotDbContext>())
