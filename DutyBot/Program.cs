@@ -191,8 +191,9 @@ namespace DutyBot
                     using (var repository = new Repository<DutyBotDbContext>())
                     {
                         var users = repository.GetList<User>(u => u.DutyEnd < DateTime.Now & u.State == 5);
-                        foreach(var user in users)
+                        foreach(var usr in users)
                         {
+                            var user = repository.Get<User>(u => u.Id == usr.Id);
                             user.State = 3;
                             repository.Update();
                         }
@@ -223,14 +224,17 @@ namespace DutyBot
                     {
                         var users =
                             repository.GetList<User>(
-                                u => u.DutyStart > DateTime.Now & u.DutyEnd < DateTime.Now & u.State == 5);
-                        if (enumerable.Any() && users.Any())
+                                u => u.DutyStart < DateTime.Now & u.DutyEnd > DateTime.Now & u.State == 5);
+                        var enusers = users as IList<User> ?? users.ToList();
+                        if (enumerable.Any() && enusers.Any())
                         {
                             _issue = enumerable.Last();
-                            foreach (var user in users)
+                            foreach (var usr in enusers)
                             {
-                                _jiraConn = Jira.CreateRestClient(_jiraParam.Value, user.Login, user.Password);
+                                _jiraConn = Jira.CreateRestClient(_jiraParam.Value, usr.Login, usr.Password);
+                                var user = repository.Get<User>(u => u.Id == usr.Id);
                                 user.TicketNumber = _issue.Key.ToString();
+                                user.State = 6;
                                 _bot.SendMessage(user.TlgNumber, _issue);
                                 repository.Update();
                             }
@@ -355,7 +359,8 @@ namespace DutyBot
                             _bot.SendMessage(message.chat.id,
                                 "Привет, " + message.chat.first_name +
                                 @"! Меня зовут DutyBot, я создан, чтобы помогать дежурить. Давай знакомиться!
- ","{\"keyboard\": [[\"Рассказать DutyBot'у о себе\"], [\"Не хочу знакомиться, ты мне не нравишься\"]],\"resize_keyboard\":true,\"one_time_keyboard\":true}");
+ ",
+                                "{\"keyboard\": [[\"Рассказать DutyBot'у о себе\"], [\"Не хочу знакомиться, ты мне не нравишься\"]],\"resize_keyboard\":true,\"one_time_keyboard\":true}");
                             user.State = 0;
                             break;
                         case 0:
@@ -434,7 +439,7 @@ namespace DutyBot
                                             user.TicketNumber = _ticket.Key.ToString();
                                             user.State = 4;
                                             _bot.SendMessage(message.chat.id, _ticket);
-                                          }
+                                        }
                                         else
                                         {
                                             _bot.SendMessage(message.chat.id, "Тикетов нет",
@@ -446,16 +451,16 @@ namespace DutyBot
                                     {
                                         _bot.SendMessage(message.chat.id, "Jira не доступна",
                                             "{\"keyboard\": [[\"Проверь тикеты\"], [\"Кто сейчас дежурит?\"], [\"Помоги с дежурством\"], [\"Пока ничего\"]],\"resize_keyboard\":true,\"one_time_keyboard\":true}");
-                                            var logReccord = new Log
-                                            {
-                                                Date = DateTime.Now,
-                                                MessageTipe = "error",
-                                                UserId = 0,
-                                                Operation = "SendThatJiraDoesNotWork",
-                                                Exception = ex.GetType() + ": " + ex.Message,
-                                                AddInfo = ""
-                                            };
-                                            repository.Create(logReccord);
+                                        var logReccord = new Log
+                                        {
+                                            Date = DateTime.Now,
+                                            MessageTipe = "error",
+                                            UserId = 0,
+                                            Operation = "SendThatJiraDoesNotWork",
+                                            Exception = ex.GetType() + ": " + ex.Message,
+                                            AddInfo = ""
+                                        };
+                                        repository.Create(logReccord);
                                     }
 
                                     break;
@@ -497,13 +502,13 @@ namespace DutyBot
                                     break;
                                 default:
                                     _bot.SendMessage(message.chat.id, "Чем я могу помочь?",
-                                "{\"keyboard\": [[\"Проверь тикеты\"], [\"Кто сейчас дежурит?\"], [\"Помоги с дежурством\"], [\"Пока ничего\"]],\"resize_keyboard\":true,\"one_time_keyboard\":true}");
-                               break;
+                                        "{\"keyboard\": [[\"Проверь тикеты\"], [\"Кто сейчас дежурит?\"], [\"Помоги с дежурством\"], [\"Пока ничего\"]],\"resize_keyboard\":true,\"one_time_keyboard\":true}");
+                                    break;
                             }
-                            
+
                             break;
                         case 4:
-                            if (_ticket.Key.ToString().Equals(user.TicketNumber))
+                            if (_ticket.Assignee == null & _ticket.Key.ToString().Equals(user.TicketNumber))
                             {
                                 switch ((message.text))
                                 {
@@ -512,7 +517,8 @@ namespace DutyBot
                                             "{\"keyboard\": [[\"Технологи\", \"Коммерция\"], [\"Админы\", \"Связисты\"], [\"Олеся\", \"Женя\"], [\"Алексей\", \"Максим\"], [\"Паша\", \"Марина\"], [\"Андрей\", \"Гриша\"], [\"Оля\", \"Настя\"]],\"resize_keyboard\":true,\"one_time_keyboard\":true}");
                                         break;
                                     case "Решить":
-                                        JiraAddFuncions.ResolveTicket(user, _ticket, message, user.Login, _bot, _jiraConn);
+                                        JiraAddFuncions.ResolveTicket(user, _ticket, message, user.Login, _bot,
+                                            _jiraConn);
                                         break;
                                     case "Назначить себе":
                                         JiraAddFuncions.AssingTicket(user, _ticket, message, user.Login, _bot, _jiraConn);
@@ -522,7 +528,8 @@ namespace DutyBot
                                             _jiraConn);
                                         break;
                                     case "Коммерция":
-                                        JiraAddFuncions.AssingTicket(user, _ticket, message, "crm_otdel", _bot, _jiraConn);
+                                        JiraAddFuncions.AssingTicket(user, _ticket, message, "crm_otdel", _bot,
+                                            _jiraConn);
                                         break;
                                     case "Админы":
                                         JiraAddFuncions.AssingTicket(user, _ticket, message, "Uk.Jira.TechSupport", _bot,
@@ -537,16 +544,20 @@ namespace DutyBot
                                             _jiraConn);
                                         break;
                                     case "Женя":
-                                        JiraAddFuncions.AssingTicket(user, _ticket, message, "ev.safonov", _bot, _jiraConn);
+                                        JiraAddFuncions.AssingTicket(user, _ticket, message, "ev.safonov", _bot,
+                                            _jiraConn);
                                         break;
                                     case "Алексей":
-                                        JiraAddFuncions.AssingTicket(user, _ticket, message, "a.sapotko", _bot, _jiraConn);
+                                        JiraAddFuncions.AssingTicket(user, _ticket, message, "a.sapotko", _bot,
+                                            _jiraConn);
                                         break;
                                     case "Максим":
-                                        JiraAddFuncions.AssingTicket(user, _ticket, message, "m.shemetov", _bot, _jiraConn);
+                                        JiraAddFuncions.AssingTicket(user, _ticket, message, "m.shemetov", _bot,
+                                            _jiraConn);
                                         break;
                                     case "Андрей":
-                                        JiraAddFuncions.AssingTicket(user, _ticket, message, "an.zarubin", _bot, _jiraConn);
+                                        JiraAddFuncions.AssingTicket(user, _ticket, message, "an.zarubin", _bot,
+                                            _jiraConn);
                                         break;
                                     case "Гриша":
                                         JiraAddFuncions.AssingTicket(user, _ticket, message, "g.dementiev", _bot,
@@ -565,28 +576,72 @@ namespace DutyBot
                                             _jiraConn);
                                         break;
                                     case "Паша":
-                                        JiraAddFuncions.AssingTicket(user, _ticket, message, "p.denisov", _bot, _jiraConn);
+                                        JiraAddFuncions.AssingTicket(user, _ticket, message, "p.denisov", _bot,
+                                            _jiraConn);
                                         break;
                                 }
                             }
                             else
                             {
-                                _bot.SendMessage(message.chat.id, "Похоже, тикет уже распределён.");
+                                _bot.SendMessage(message.chat.id, "Похоже, тикет уже распределён.",
+                                    "{\"keyboard\": [[\"Проверь тикеты\"], [\"Кто сейчас дежурит?\"], [\"Помоги с дежурством\"], [\"Пока ничего\"]],\"resize_keyboard\":true,\"one_time_keyboard\":true}");
                                 user.State = 3;
                             }
                             break;
                         case 5:
                             switch (message.text)
                             {
+
+                                case ("Остановить мониторинг"):
+                                {
+                                    _bot.SendMessage(message.chat.id, "Готово");
+                                    user.State = 3;
+                                    break;
+                                }
+                                case ("Продолжить мониторинг"):
+                                {
+                                    _bot.SendMessage(message.chat.id, "Хорошо, продолжим");
+                                    break;
+                                }
+                                default:
+                                    _bot.SendMessage(message.chat.id, "да?",
+                                        "{\"keyboard\": [[\"Остановить мониторинг\"], [\"Продолжить мониторинг\"]],\"resize_keyboard\":true,\"one_time_keyboard\":true}");
+                                    break;
+                            }
+                            break;
+
+                        case 6:
+                            switch (message.text)
+                            {
                                 case "Распределить":
-                                    _bot.SendMessage(message.chat.id, "Кому назначим?",
-                                        "{\"keyboard\": [[\"Технологи\", \"Коммерция\"], [\"Админы\", \"Связисты\"], [\"Олеся\", \"Женя\"], [\"Алексей\", \"Максим\"], [\"Паша\", \"Марина\"], [\"Андрей\", \"Гриша\"], [\"Оля\", \"Настя\"]],\"resize_keyboard\":true,\"one_time_keyboard\":true}");
+                                    if (_issue.Assignee == null & _issue.Key.ToString().Equals(user.TicketNumber))
+                                    {
+                                        _bot.SendMessage(message.chat.id, "Кому назначим?",
+                                            "{\"keyboard\": [[\"Технологи\", \"Коммерция\"], [\"Админы\", \"Связисты\"], [\"Олеся\", \"Женя\"], [\"Алексей\", \"Максим\"], [\"Паша\", \"Марина\"], [\"Андрей\", \"Гриша\"], [\"Оля\", \"Настя\"]],\"resize_keyboard\":true,\"one_time_keyboard\":true}");
+                                        break;
+                                    }
+                                    _bot.SendMessage(message.chat.id, "Похоже, тикет уже распределён.");
+                                    user.State = 5;
                                     break;
                                 case "Решить":
-                                    JiraAddFuncions.ResolveTicket(user, _issue, message, user.Login, _bot, _jiraConn);
+                                    if (_issue.Assignee == null & _issue.Key.ToString().Equals(user.TicketNumber))
+                                    {
+                                        JiraAddFuncions.ResolveTicket(user, _issue, message, user.Login, _bot,
+                                            _jiraConn);
+                                        break;
+                                    }
+                                    _bot.SendMessage(message.chat.id, "Похоже, тикет уже распределён.");
+                                    user.State = 5;
                                     break;
                                 case "Назначить себе":
-                                    JiraAddFuncions.AssingTicket(user, _issue, message, user.Login, _bot, _jiraConn);
+                                    if (_issue.Assignee == null & _issue.Key.ToString().Equals(user.TicketNumber))
+                                    {
+                                        JiraAddFuncions.AssingTicket(user, _issue, message, user.Login, _bot,
+                                            _jiraConn);
+                                        break;
+                                    }
+                                    _bot.SendMessage(message.chat.id, "Похоже, тикет уже распределён.");
+                                    user.State = 5;
                                     break;
                                 case "Технологи":
                                     JiraAddFuncions.AssingTicket(user, _issue, message, "technologsupport", _bot,
@@ -600,34 +655,43 @@ namespace DutyBot
                                         _jiraConn);
                                     break;
                                 case "Связисты":
-                                    JiraAddFuncions.AssingTicket(user, _issue, message, "uk.jira.noc", _bot, _jiraConn);
+                                    JiraAddFuncions.AssingTicket(user, _issue, message, "uk.jira.noc", _bot,
+                                        _jiraConn);
                                     break;
                                 case "Олеся":
-                                    JiraAddFuncions.AssingTicket(user, _issue, message, "o.likhacheva", _bot, _jiraConn);
+                                    JiraAddFuncions.AssingTicket(user, _issue, message, "o.likhacheva", _bot,
+                                        _jiraConn);
                                     break;
                                 case "Женя":
-                                    JiraAddFuncions.AssingTicket(user, _issue, message, "ev.safonov", _bot, _jiraConn);
+                                    JiraAddFuncions.AssingTicket(user, _issue, message, "ev.safonov", _bot,
+                                        _jiraConn);
                                     break;
                                 case "Алексей":
                                     JiraAddFuncions.AssingTicket(user, _issue, message, "a.sapotko", _bot, _jiraConn);
                                     break;
                                 case "Максим":
-                                    JiraAddFuncions.AssingTicket(user, _issue, message, "m.shemetov", _bot, _jiraConn);
+                                    JiraAddFuncions.AssingTicket(user, _issue, message, "m.shemetov", _bot,
+                                        _jiraConn);
                                     break;
                                 case "Андрей":
-                                    JiraAddFuncions.AssingTicket(user, _issue, message, "an.zarubin", _bot, _jiraConn);
+                                    JiraAddFuncions.AssingTicket(user, _issue, message, "an.zarubin", _bot,
+                                        _jiraConn);
                                     break;
                                 case "Гриша":
-                                    JiraAddFuncions.AssingTicket(user, _issue, message, "g.dementiev", _bot, _jiraConn);
+                                    JiraAddFuncions.AssingTicket(user, _issue, message, "g.dementiev", _bot,
+                                        _jiraConn);
                                     break;
                                 case "Оля":
-                                    JiraAddFuncions.AssingTicket(user, _issue, message, "o.tkachenko", _bot, _jiraConn);
+                                    JiraAddFuncions.AssingTicket(user, _issue, message, "o.tkachenko", _bot,
+                                        _jiraConn);
                                     break;
                                 case "Настя":
-                                    JiraAddFuncions.AssingTicket(user, _issue, message, "a.zakharova", _bot, _jiraConn);
+                                    JiraAddFuncions.AssingTicket(user, _issue, message, "a.zakharova", _bot,
+                                        _jiraConn);
                                     break;
                                 case "Марина":
-                                    JiraAddFuncions.AssingTicket(user, _issue, message, "m.vinnikova", _bot, _jiraConn);
+                                    JiraAddFuncions.AssingTicket(user, _issue, message, "m.vinnikova", _bot,
+                                        _jiraConn);
                                     break;
                                 case "Паша":
                                     JiraAddFuncions.AssingTicket(user, _issue, message, "p.denisov", _bot, _jiraConn);
@@ -640,11 +704,11 @@ namespace DutyBot
                                 }
 
                                 case "Продолжить мониторинг":
-                                    {
-                                        user.State = 6;
-                                        _bot.SendMessage(message.chat.id, "Хорошо, продолжим");
-                                        break;
-                                    }
+                                {
+                                    user.State = 5;
+                                    _bot.SendMessage(message.chat.id, "Хорошо, продолжим");
+                                    break;
+                                }
 
                                 default:
                                     _bot.SendMessage(message.chat.id, "да?",
@@ -652,52 +716,29 @@ namespace DutyBot
                                     break;
                             }
                             break;
-                        case 6:
-                            if (_issue.Key.ToString().Equals(user.TicketNumber))
-                            {
-                                switch (message.text)
-                                {
-
-                                    case ("Остановить мониторинг"):
-                                    {
-                                        _bot.SendMessage(message.chat.id, "Готово");
-                                        user.State = 3;
-                                        break;
-                                    }
-                                    default:
-                                        _bot.SendMessage(message.chat.id, "да?",
-                                            "{\"keyboard\": [[\"Остановить мониторинг\"], [\"Продолжить мониторинг\"]],\"resize_keyboard\":true,\"one_time_keyboard\":true}");
-                                        break;
-                                }
-                            }
-                            else
-                            {
-                                _bot.SendMessage(message.chat.id, "Похоже, тикет уже распределён.");
-                                user.State = 5;
-                            }
-                            break;
                     }
                     repository.Update();
                 }
             }
-            catch (Exception ex)
+            catch
+                (Exception ex)
             {
                 using (var repository = new Repository<DutyBotDbContext>())
                 {
-                    if(user.State > 3) user.State = 3;
+                    if (user.State > 3) user.State = 3;
                     _bot.SendMessage(message.chat.id, "Что-то пошло не так при обработке сообщения.");
                     repository.Update();
 
                     var logReccord = new Log
-                        {
-                            Date = DateTime.Now,
-                            MessageTipe = "info",
-                            UserId = message.chat.id,
-                            Operation = "ProcessMessage",
-                            Exception = ex.Message,
-                            AddInfo = ""
-                        };
-                        repository.Create(logReccord);
+                    {
+                        Date = DateTime.Now,
+                        MessageTipe = "info",
+                        UserId = message.chat.id,
+                        Operation = "ProcessMessage",
+                        Exception = ex.Message,
+                        AddInfo = ""
+                    };
+                    repository.Create(logReccord);
                 }
                 Thread.Sleep(5000);
             }
