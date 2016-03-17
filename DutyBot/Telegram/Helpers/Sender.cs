@@ -11,7 +11,7 @@ namespace Telegram
 {
     static class Sender
     {
-        static public string Send(string url, string message = "", string contentType = "application/x-www-form-urlencoded")
+        public static string Send(string url, string message = "", string contentType = "application/x-www-form-urlencoded")
         {
             url = UrlClearer.Clear(url);
 
