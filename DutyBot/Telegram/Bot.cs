@@ -43,6 +43,5 @@ namespace Telegram
             updates newupdate = JsonConvert.DeserializeObject<updates>(Sender.Send("https://api.telegram.org/bot" + _botkey + "/Getupdates?offset=" + offset));
             return newupdate;
         }
-
     }
 }  

@@ -668,12 +668,13 @@ namespace DutyBot
                     using (var repository = new Repository<DutyBotDbContext>())
                     {
                         var users = repository.GetList<User>(u => u.DutyEnd < DateTime.Now & u.State == 5);
-                        foreach(var usr in users)
+                        
+                        foreach (var usr in users)
                         {
-                            var user = repository.Get<User>(u => u.Id == usr.Id);
-                            user.State = 3;
-                            repository.Update();
+                            usr.State = 3;
                         }
+                        repository.Update();
+                        repository.Dispose();
                     }
                 }
                 catch (Exception ex)
