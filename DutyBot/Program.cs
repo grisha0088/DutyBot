@@ -493,6 +493,11 @@ namespace DutyBot
                                             JiraAddFuncions.AssingTicket(user, _ticket, message, "p.denisov", _bot,
                                                 _jiraConn);
                                             break;
+                                        default:
+                                            _bot.SendMessage(message.chat.id, "",
+                                        "{\"keyboard\": [[\"Проверь тикеты\"], [\"Кто сейчас дежурит?\"], [\"Помоги с дежурством\"], [\"Пока ничего\"]],\"resize_keyboard\":true,\"one_time_keyboard\":true}");
+                                            user.State = 3;
+                                            break;
                                     }
                                 }
                                 else
@@ -507,16 +512,12 @@ namespace DutyBot
                                 {
 
                                     case ("Остановить мониторинг"):
-                                    {
                                         _bot.SendMessage(message.chat.id, "Готово");
                                         user.State = 3;
                                         break;
-                                    }
                                     case ("Продолжить мониторинг"):
-                                    {
                                         _bot.SendMessage(message.chat.id, "Хорошо, продолжим");
                                         break;
-                                    }
                                     default:
                                         _bot.SendMessage(message.chat.id, "да?",
                                             "{\"keyboard\": [[\"Остановить мониторинг\"], [\"Продолжить мониторинг\"]],\"resize_keyboard\":true,\"one_time_keyboard\":true}");
@@ -640,7 +641,7 @@ namespace DutyBot
                     using (var repository = new Repository<DutyBotDbContext>())
                     {
                         if (user.State > 3) user.State = 3;
-                        _bot.SendMessage(message.chat.id, "Что-то пошло не так при обработке сообщения.");
+                        _bot.SendMessage(message.chat.id, "Что-то пошло не так при обработке сообщения. Что будем делать?", "{\"keyboard\": [[\"Проверь тикеты\"], [\"Кто сейчас дежурит?\"], [\"Помоги с дежурством\"], [\"Пока ничего\"]],\"resize_keyboard\":true,\"one_time_keyboard\":true}");
                         repository.Update();
 
                         var logReccord = new Log
