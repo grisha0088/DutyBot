@@ -493,6 +493,11 @@ namespace DutyBot
                                             JiraAddFuncions.AssingTicket(user, _ticket, message, "p.denisov", _bot,
                                                 _jiraConn);
                                             break;
+                                        default:
+                                            _bot.SendMessage(message.chat.id, "",
+                                        "{\"keyboard\": [[\"Проверь тикеты\"], [\"Кто сейчас дежурит?\"], [\"Помоги с дежурством\"], [\"Пока ничего\"]],\"resize_keyboard\":true,\"one_time_keyboard\":true}");
+                                            user.State = 3;
+                                            break;
                                     }
                                 }
                                 else
@@ -507,16 +512,12 @@ namespace DutyBot
                                 {
 
                                     case ("Остановить мониторинг"):
-                                    {
                                         _bot.SendMessage(message.chat.id, "Готово");
                                         user.State = 3;
                                         break;
-                                    }
                                     case ("Продолжить мониторинг"):
-                                    {
                                         _bot.SendMessage(message.chat.id, "Хорошо, продолжим");
                                         break;
-                                    }
                                     default:
                                         _bot.SendMessage(message.chat.id, "да?",
                                             "{\"keyboard\": [[\"Остановить мониторинг\"], [\"Продолжить мониторинг\"]],\"resize_keyboard\":true,\"one_time_keyboard\":true}");
@@ -640,7 +641,7 @@ namespace DutyBot
                     using (var repository = new Repository<DutyBotDbContext>())
                     {
                         if (user.State > 3) user.State = 3;
-                        _bot.SendMessage(message.chat.id, "Что-то пошло не так при обработке сообщения.");
+                        _bot.SendMessage(message.chat.id, "Что-то пошло не так при обработке сообщения. Что будем делать?", "{\"keyboard\": [[\"Проверь тикеты\"], [\"Кто сейчас дежурит?\"], [\"Помоги с дежурством\"], [\"Пока ничего\"]],\"resize_keyboard\":true,\"one_time_keyboard\":true}");
                         repository.Update();
 
                         var logReccord = new Log
@@ -663,19 +664,27 @@ namespace DutyBot
             _jiraConn = Jira.CreateRestClient(_jiraParam.Value, _userLoginParam.Value, _userPasswordParam.Value);
             while (_checkjiraflag)
             {
-                try  //если дежурство закончилось сбрасываю статус пользователя на 3
+                try  
                 {
-                    using (var repository = new Repository<DutyBotDbContext>())
+                    using (var repository = new Repository<DutyBotDbContext>()) //если дежурство закончилось сбрасываю статус пользователя на 3
                     {
                         var users = repository.GetList<User>(u => u.DutyEnd < DateTime.Now & u.State == 5);
-                        
                         foreach (var usr in users)
                         {
                             usr.State = 3;
                         }
                         repository.Update();
-                        repository.Dispose();
                     }
+                    using (var repository = new Repository<DutyBotDbContext>()) //если статус 6 (обработка тикета), а дежурство закончилось, меняю на 4
+                    {
+                        var users = repository.GetList<User>(u => u.DutyEnd < DateTime.Now & u.State == 6);
+                        foreach (var usr in users)
+                        {
+                            usr.State = 4;
+                        }
+                        repository.Update();
+                    }
+
                 }
                 catch (Exception ex)
                 {
