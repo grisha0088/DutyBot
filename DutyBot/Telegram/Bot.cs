@@ -32,10 +32,11 @@ namespace Telegram
         public void SendMessage(int chatid, Issue tc)
         {
 
-            SendMessage(chatid, tc.Key + @"
-            " + tc.Reporter + @"
-            " + tc.Summary + @"
-            " + tc.Description, "{\"keyboard\": [[\"Распределить\"], [\"Решить\"], [\"Назначить себе\"]],\"resize_keyboard\":true,\"one_time_keyboard\":true}");
+            SendMessage(chatid, tc.Key + System.Environment.NewLine 
+                + tc.Reporter + System.Environment.NewLine
+                + tc.Priority.Name + System.Environment.NewLine
+                + tc.Summary + System.Environment.NewLine 
+                + tc.Description, "{\"keyboard\": [[\"Распределить\"], [\"Решить\"], [\"Назначить себе\"]],\"resize_keyboard\":true,\"one_time_keyboard\":true}");
         }
 
         public updates Getupdates(int offset)

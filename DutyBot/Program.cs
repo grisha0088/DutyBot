@@ -664,19 +664,27 @@ namespace DutyBot
             _jiraConn = Jira.CreateRestClient(_jiraParam.Value, _userLoginParam.Value, _userPasswordParam.Value);
             while (_checkjiraflag)
             {
-                try  //если дежурство закончилось сбрасываю статус пользователя на 3
+                try  
                 {
-                    using (var repository = new Repository<DutyBotDbContext>())
+                    using (var repository = new Repository<DutyBotDbContext>()) //если дежурство закончилось сбрасываю статус пользователя на 3
                     {
                         var users = repository.GetList<User>(u => u.DutyEnd < DateTime.Now & u.State == 5);
-                        
                         foreach (var usr in users)
                         {
                             usr.State = 3;
                         }
                         repository.Update();
-                        repository.Dispose();
                     }
+                    using (var repository = new Repository<DutyBotDbContext>()) //если статус 6 (обработка тикета), а дежурство закончилось, меняю на 4
+                    {
+                        var users = repository.GetList<User>(u => u.DutyEnd < DateTime.Now & u.State == 6);
+                        foreach (var usr in users)
+                        {
+                            usr.State = 4;
+                        }
+                        repository.Update();
+                    }
+
                 }
                 catch (Exception ex)
                 {
