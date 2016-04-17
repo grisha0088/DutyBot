@@ -732,7 +732,7 @@ namespace DutyBot
                             }
                             var inProgressUsers = 
                                 repository.GetList<User>(
-                                    u => u.DutyStart < DateTime.Now & u.DutyEnd > DateTime.Now & u.State == 6 & u.TicketNumber == lastIssue.Key.Value).ToList();
+                                    u => u.DutyStart < DateTime.Now & u.DutyEnd > DateTime.Now & u.State == 6 & u.TicketNumber != lastIssue.Key.Value).ToList();
                             //кто обрабатывает  неактуальный тикет
                             if (inProgressUsers == null || inProgressUsers.Any())
                             {
