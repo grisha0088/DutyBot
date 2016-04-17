@@ -24,6 +24,7 @@ namespace Telegram
             Sender.Send("https://api.telegram.org/bot" + _botkey + "/sendmessage?chat_id=" + chatid + "&text=" + message + "&reply_markup=" + replyMarkup);
         }
 
+
         public void SendMessage(int chatid, string message)
         {
             Sender.Send("https://api.telegram.org/bot" + _botkey + "/sendmessage?chat_id=" + chatid + "&text=" + message);
