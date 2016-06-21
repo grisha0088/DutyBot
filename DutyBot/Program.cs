@@ -426,7 +426,7 @@ namespace DutyBot
                                     {
                                         case "Распределить":
                                             _bot.SendMessage(message.chat.id, "Кому назначим?",
-                                                "{\"keyboard\": [[\"Технологи\", \"Коммерция\"], [\"Админы\", \"Связисты\"], [\"Олеся\", \"Женя\"], [\"Алексей\", \"Максим\"], [\"Паша\", \"Марина\"], [\"Андрей\", \"Гриша\"], [\"Оля\", \"Настя\"]],\"resize_keyboard\":true,\"one_time_keyboard\":true}");
+                                                "{\"keyboard\": [[\"Технологи\", \"Коммерция\"], [\"Админы\", \"Связисты\"], [\"Олеся\", \"Женя\"], [\"Алексей\", \"Максим\"], [\"Паша\", \"Марина\"], [\"Андрей\", \"Гриша\"], [\"Оля\", \"Настя\"], [\"Маркетинг\", \"Даша\"]],\"resize_keyboard\":true,\"one_time_keyboard\":true}");
                                             break;
                                         case "Решить":
                                             JiraAddFuncions.ResolveTicket(user, _ticket, message, user.Login, _bot,
@@ -494,6 +494,14 @@ namespace DutyBot
                                             JiraAddFuncions.AssingTicket(user, _ticket, message, "p.denisov", _bot,
                                                 _jiraConn);
                                             break;
+                                        case "Даша":
+                                            JiraAddFuncions.AssingTicket(user, _ticket, message, "d.kormushina", _bot,
+                                                _jiraConn);
+                                            break;
+                                        case "Маркетинг":
+                                            JiraAddFuncions.AssingTicket(user, _ticket, message, "Uk.Jira.TradeMarketing", _bot,
+                                                _jiraConn);
+                                            break;
                                         default:
                                             _bot.SendMessage(message.chat.id, "",
                                         "{\"keyboard\": [[\"Проверь тикеты\"], [\"Кто сейчас дежурит?\"], [\"Помоги с дежурством\"], [\"Пока ничего\"]],\"resize_keyboard\":true,\"one_time_keyboard\":true}");
@@ -534,7 +542,7 @@ namespace DutyBot
                                         if (lastIssue.Assignee == null & lastIssue.Key.ToString().Equals(user.TicketNumber))
                                         {
                                             _bot.SendMessage(message.chat.id, "Кому назначим?",
-                                                "{\"keyboard\": [[\"Технологи\", \"Коммерция\"], [\"Админы\", \"Связисты\"], [\"Олеся\", \"Женя\"], [\"Алексей\", \"Максим\"], [\"Паша\", \"Марина\"], [\"Андрей\", \"Гриша\"], [\"Оля\", \"Настя\"]],\"resize_keyboard\":true,\"one_time_keyboard\":true}");
+                                                "{\"keyboard\": [[\"Технологи\", \"Коммерция\"], [\"Админы\", \"Связисты\"], [\"Олеся\", \"Женя\"], [\"Алексей\", \"Максим\"], [\"Паша\", \"Марина\"], [\"Андрей\", \"Гриша\"], [\"Оля\", \"Настя\"], [\"Маркетинг\", \"Даша\"]],\"resize_keyboard\":true,\"one_time_keyboard\":true}");
                                             break;
                                         }
                                         _bot.SendMessage(message.chat.id, "Похоже, тикет уже распределён.");
@@ -612,6 +620,12 @@ namespace DutyBot
                                         break;
                                     case "Паша":
                                         JiraAddFuncions.AssingTicket(user, lastIssue, message, "p.denisov", _bot, _jiraConn);
+                                        break;
+                                    case "Маркетинг":
+                                        JiraAddFuncions.AssingTicket(user, lastIssue, message, "Uk.Jira.TradeMarketing", _bot, _jiraConn);
+                                        break;
+                                    case "Даша":
+                                        JiraAddFuncions.AssingTicket(user, lastIssue, message, "d.kormushina", _bot, _jiraConn);
                                         break;
                                     case "Остановить мониторинг":
                                     {
