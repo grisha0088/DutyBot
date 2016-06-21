@@ -499,7 +499,7 @@ namespace DutyBot
                                                 _jiraConn);
                                             break;
                                         case "Маркетинг":
-                                            JiraAddFuncions.AssingTicket(user, _ticket, message, "Uk.Jira.TradeMarketing", _bot,
+                                            JiraAddFuncions.AssingTicket(user, _ticket, message, "Uk.Jira.TradeMarketi", _bot,
                                                 _jiraConn);
                                             break;
                                         default:
@@ -622,7 +622,7 @@ namespace DutyBot
                                         JiraAddFuncions.AssingTicket(user, lastIssue, message, "p.denisov", _bot, _jiraConn);
                                         break;
                                     case "Маркетинг":
-                                        JiraAddFuncions.AssingTicket(user, lastIssue, message, "Uk.Jira.TradeMarketing", _bot, _jiraConn);
+                                        JiraAddFuncions.AssingTicket(user, lastIssue, message, "Uk.Jira.TradeMarketi", _bot, _jiraConn);
                                         break;
                                     case "Даша":
                                         JiraAddFuncions.AssingTicket(user, lastIssue, message, "d.kormushina", _bot, _jiraConn);
